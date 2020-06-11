@@ -58,10 +58,10 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
     @Override
     public void setPosition(double x, double y) {
         super.setPosition(x, y);
-        setExplosions();
+        setExplosion();
     }
 
-    private void setExplosions() {
+    private void setExplosion() {
         for (String dir : explosion.keySet()) {
             if(dir == "up") {
                 for (int i = 0; i < explosion.get(dir).size(); i++) {
@@ -78,7 +78,7 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
                     explosion.get(dir).get(i).setPosition(getX() - 28*(i+1), getY());
                 }
             }
-            else {
+            else if(dir == "right") {
                 for (int i = 0; i < explosion.get(dir).size(); i++) {
                     explosion.get(dir).get(i).setPosition(getX() + 28*(i+1), getY());
                 }

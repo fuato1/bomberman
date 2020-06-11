@@ -37,6 +37,7 @@ public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
         OGAbstractFactory factory = OGFactoryProducer.getFactory();
         Explosion e = factory.getExplosion();
         e.setPosition(this.getX(), this.getY());
+        setPosition(0, 0);
 
         return e;
     }

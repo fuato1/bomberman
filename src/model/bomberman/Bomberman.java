@@ -25,6 +25,7 @@ import model.factory.OGFactoryProducer;
 import model.fx_player.FXPlayer;
 import model.jugador.Jugador;
 import model.pared.Pared;
+import model.pared.ParedLadrillo;
 
 public class Bomberman extends JGame {
     /*
@@ -101,10 +102,10 @@ public class Bomberman extends JGame {
 
         OGAbstractFactory f = OGFactoryProducer.getFactory();
         walls.addAll(f.getParedes(Pared.PARED_PIEDRA, BORDER_WALLS + INTERIOR_WALLS));
-        brickWalls.addAll(f.getParedes(Pared.PARED_LADRILLO, 3));
+        brickWalls.addAll(f.getParedes(Pared.PARED_LADRILLO, 5));
 
-        enemies.addAll(f.getEnemigos(Enemigo.ENEMIGO_ROSA, 1));
-        enemies.addAll(f.getEnemigos(Enemigo.ENEMIGO_AZUL, 1));
+        enemies.addAll(f.getEnemigos(Enemigo.ENEMIGO_ROSA, 2));
+        enemies.addAll(f.getEnemigos(Enemigo.ENEMIGO_AZUL, 2));
 
         bonus.add(f.getBonus(Bonus.VIDA_EXTRA));
         bonus.add(f.getBonus(Bonus.BOMBA_EXTRA));
@@ -158,7 +159,9 @@ public class Bomberman extends JGame {
             hero.draw(g);
             
             for (Bomba b : bombs) {
-                b.draw(g);
+                if(b.getTime() > 0) {
+                    b.draw(g);
+                }
             }
 
             for (Explosion e : explosions) {
@@ -186,16 +189,16 @@ public class Bomberman extends JGame {
                 p.draw(g);
             }
 
-            // for (Pared p : brickWalls) {
-            //     p.draw(g);
-            // }
+            for (Pared p : brickWalls) {
+                p.draw(g);
+            }
 
             /*
                 dibujando enemigos
             */
-            // for (Enemigo e : enemies) {
-            //     e.draw(g);
-            // }
+            for (Enemigo e : enemies) {
+                e.draw(g);
+            }
 
             // /*
             //     dibujando bonus
@@ -319,64 +322,47 @@ public class Bomberman extends JGame {
             if(keyboard.isKeyPressed(KeyEvent.VK_RIGHT)) {
                 hero.changeObject("right");
                 hero.right(delta);
-
-                // for (int i = 0; i < enemies.size(); i++) {
-                //     Random r = new Random();
-                //     double x = LEFT_WALL_LIMIT + 32*(r.nextInt(22)+1);
-                //     double y = UPPER_WALL_LIMIT + 32*(r.nextInt(10)+1);
-
-                //     while(x%2 != 0 && y%2 != 0) {
-                //         x = LEFT_WALL_LIMIT + 32*(r.nextInt(22)+1);
-                //         y = UPPER_WALL_LIMIT + 32*(r.nextInt(10)+1);
-                //         System.out.println("x: " + x + ", " + "y: " + y);
-                //     }
-
-                //     enemies.get(i).setPosition(x, y);
-                // }
             }
 
-            for (KeyEvent e : keyboard.getEvents()) {
-                if((e.getID() == KeyEvent.KEY_PRESSED) && (e.getKeyCode() == KeyEvent.VK_SPACE)) {
-                    /*
-                        se checkea que na haya mas bombas de las que el heroe puede usar (sin bonus)
-                    */
-                    if(bombs.size() == 2) {
-                        /*
-                            se checkea que haya bombas y explosiones para ir quitando del mapa
-                            y que no haya ninguna explosion activa (solo se puede explotar una bomba y
-                            luego colocar otra cuando la anterior se desvanecio)
-                        */
-                        if(!bombs.isEmpty() && !Bomba.isActive()) {
-                            bombs.get(0).setPosition(0, 0);
-                            bombs.remove(0);
-                        }
-                        if(!explosions.isEmpty() && !Bomba.isActive()) {
-                            explosions.get(0).setPosition(0, 0);
-                            explosions.remove(0);
-                        }
-                    }
-                    else {
-                        /*
-                            el heroe instancia y setea la bomba en su posicion actual
-                            para colocarla
-                        */
-                        Bomba b = hero.setBomb();
+            /*
+                se checkea que na haya mas bombas de las que el heroe puede usar (sin bonus)
+            */
+            if(bombs.size() == 2 && !Bomba.isActive()) {
+                /*
+                    se checkea que haya bombas y explosiones para ir quitando del mapa
+                    y que no haya ninguna explosion activa (solo se puede explotar una bomba y
+                    luego colocar otra cuando la anterior se desvanecio)
+                */
+                if(!bombs.isEmpty()) {
+                    bombs.remove(0);
+                }
+                if(!explosions.isEmpty()) {
+                    explosions.remove(0);
+                }
+            }
 
+            for (KeyEvent ke : keyboard.getEvents()) {
+                if((ke.getID() == KeyEvent.KEY_PRESSED) && (ke.getKeyCode() == KeyEvent.VK_SPACE)) {
+                    /*
+                        el heroe instancia y setea la bomba en su posicion actual
+                        para colocarla
+                    */
+                    Bomba b = hero.setBomb();
+
+                    /*
+                        si el objeto Bomba no es nulo
+                    */
+                    if(b != null) {
                         /*
-                            si el objeto Bomba no es nulo
+                            y no hay una bomba activa
                         */
-                        if(b != null) {
+                        if(!Bomba.isActive()) {
                             /*
-                                y no hay una bomba activa
+                                se da permiso a una nueva bomba para ser
+                                colocada y se la agrega al mapa
                             */
-                            if(!Bomba.isActive()) {
-                                /*
-                                    se da permiso a una nueva bomba para ser
-                                    colocada y se la agrega al mapa
-                                */
-                                Bomba.setActive(true);
-                                bombs.add(b);
-                            }
+                            Bomba.setActive(true);
+                            bombs.add(b);
                         }
                     }
                 }
@@ -440,6 +426,28 @@ public class Bomberman extends JGame {
                 walls.get(aux).setPosition(64*j, UPPER_WALL_LIMIT + 32*(2*i + 1));
                 aux++;
             }
+        }
+
+        /*
+            posicionando a las paredes de ladrillo
+        */
+        for (Pared bw : brickWalls) {
+            Random r = new Random();
+            
+            double x = LEFT_WALL_LIMIT + 32*( 2 * (r.nextInt(11)));
+            double y = UPPER_WALL_LIMIT + 32*(2 * (r.nextInt(5)));
+            bw.setPosition(x, y);
+        }
+
+        /*
+            posicionando a los enemigos
+        */
+        for (Enemigo e : enemies) {
+            Random r = new Random();
+            
+            double x = LEFT_WALL_LIMIT + 32*( 2 * (r.nextInt(11)));
+            double y = UPPER_WALL_LIMIT + 32*(2 * (r.nextInt(5)));
+            e.setPosition(x, y);
         }
     }
 
