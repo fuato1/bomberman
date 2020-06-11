@@ -17,4 +17,12 @@ public class Puerta extends ObjetoGrafico implements Bonus {
     public void bonusHit() {
         System.out.println("bonus golpeado");
     }
+
+    @Override
+    public void changeSprites() {
+        checkAnimationCounter(20);
+
+        if(ANIMATION_COUNTER < 10)
+            update("/imagenes/bonus/puerta.png");
+    }
 }

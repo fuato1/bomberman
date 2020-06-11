@@ -1,7 +1,10 @@
 package model.bonus.strategy;
+
 import java.awt.Graphics2D;
 
-public interface Bonus {
+import model.interfaces.ObjetoCambianteEstatico;
+
+public interface Bonus extends ObjetoCambianteEstatico {
     public final static int VIDA_EXTRA = 0;
     public final static int BOMBA_EXTRA = 1;
     public final static int VELOCIDAD = 2;
@@ -11,8 +14,14 @@ public interface Bonus {
     public final static int PUERTA = 6;
 
     public void activateBonus();
+
     public void bonusHit();
+
     public void draw(Graphics2D g);
+
     public void setPosition(double x, double y);
+
     public void update(String fileName);
+
+    public void changeSprites();
 }

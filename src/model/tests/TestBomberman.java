@@ -1,6 +1,6 @@
 package model.tests;
 
-import model.Bomberman;
+import model.bomberman.Bomberman;
 
 public class TestBomberman {
     public static void main(String[] args) {

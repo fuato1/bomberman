@@ -70,13 +70,13 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
     @Override
     public ParteExplosion getTipExplosion(int id) {
         if (id == Explosion.EXPLOSION_UP)
-            return new ParteExplosion("/imagenes/explosiones/up/up_exp-1.png");
+            return new ParteExplosion("/imagenes/explosiones/up/up_exp-1.png", "up");
         if (id == Explosion.EXPLOSION_DOWN)
-            return new ParteExplosion("/imagenes/explosiones/down/down_exp-1.png");
+            return new ParteExplosion("/imagenes/explosiones/down/down_exp-1.png", "down");
         if (id == Explosion.EXPLOSION_LEFT)
-            return new ParteExplosion("/imagenes/explosiones/left/left_exp-1.png");
+            return new ParteExplosion("/imagenes/explosiones/left/left_exp-1.png", "left");
         if (id == Explosion.EXPLOSION_RIGHT)
-            return new ParteExplosion("/imagenes/explosiones/right/right_exp-1.png");
+            return new ParteExplosion("/imagenes/explosiones/right/right_exp-1.png", "right");
 
         return null;
     }
@@ -87,12 +87,12 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
 
         if (id == Explosion.EXPLOSION_UP) {
             for (int i = 0; i < n; i++) {
-                midExp.add(new ParteExplosion("/imagenes/explosiones/vertical/ver_exp-1.png"));
+                midExp.add(new ParteExplosion("/imagenes/explosiones/vertical/vertical_exp-1.png", "vertical"));
             }
         }
         if (id == Explosion.EXPLOSION_LEFT) {
             for (int i = 0; i < n; i++) {
-                midExp.add(new ParteExplosion("/imagenes/explosiones/horizontal/hor_exp-1.png"));
+                midExp.add(new ParteExplosion("/imagenes/explosiones/horizontal/horizontal_exp-1.png", "horizontal"));
             }
         }
 

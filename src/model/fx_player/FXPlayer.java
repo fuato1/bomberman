@@ -4,10 +4,13 @@ import java.io.*;
 import java.net.URL;
 import javax.sound.sampled.*;
 
+/*
+   Esta clase solo funciona para archivos .wav
+*/
 public enum FXPlayer {
-   BARRIL("barril3duendes.wav"),
-   BARBAROS("barbaros.wav"),
-   MONTAPUERCOS("montapuercos.wav");
+   STAGE_THEME("stage_theme.wav"),
+   STAGE_START("stage_start.wav"),
+   TITLE_SCREEN("title_screen.wav");
 
    public static enum Volume {
       MUTE, LOW, MEDIUM, HIGH
@@ -17,10 +20,9 @@ public enum FXPlayer {
 
    private Clip clip;
 
-   FXPlayer(String wav) {
+   private FXPlayer(String fileName) {
       try {
-
-         URL url = this.getClass().getClassLoader().getResource("sonidos/" + wav);
+         URL url = this.getClass().getClassLoader().getResource("sonidos/" + fileName);
 
          AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
 
@@ -36,7 +38,6 @@ public enum FXPlayer {
       }
    }
 
-
    public void play() {
       if (volume != Volume.MUTE) {
          if (!clip.isRunning()){
@@ -46,7 +47,10 @@ public enum FXPlayer {
       }
    }
 
-   static void init() {
-      values();
+   public void stop() {
+      if(clip.isRunning()) {
+         clip.stop();
+         clip.close();
+      }
    }
 }

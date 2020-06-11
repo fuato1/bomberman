@@ -8,34 +8,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DB {
-    private static final String DB_PATH = "./bin/app/bomberman.db";
+    private static final String DB_PATH = System.getProperty("user.dir") + ".db";
     private static final String SQL_SCORES = "CREATE TABLE IF NOT EXISTS scores \n" +
 		"(id INTEGER PRIMARY KEY AUTOINCREMENT, playerName TEXT, score INT)";
     Connection conn = null;
     Statement stmt = null;
     ResultSet rs = null;
     PreparedStatement pstmt = null;
-
-    public static void main(String[] args) {
-        DB sqlt = new DB();
-        sqlt.initDBConn();
-
-        sqlt.insertScore("P1", 100);
-        sqlt.insertScore("P2", 200);
-
-        System.out.println("***** Mostrar Todos los Puntajes *****");
-        sqlt.selectAll();
-
-        sqlt.updateScore(1, "P1", 150);
-        
-        System.out.println("***** Mostrar Todos los Puntajes *****");
-        sqlt.selectAll();
-
-        sqlt.deleteScore(1);
-
-        System.out.println("***** Mostrar Todos los Puntajes *****");
-        sqlt.selectAll();
-    }
     
     public void initDBConn() {
         try {
@@ -44,7 +23,7 @@ public class DB {
             conn = DriverManager.getConnection(url);
             System.out.println("Conectado a SQLite.");
 
-            deleteScores();
+            // deleteScores();
 
            	stmt = conn.createStatement();
             String sql = SQL_SCORES;
@@ -80,7 +59,7 @@ public class DB {
 
     public void selectAll(){
         try {
-            String sql ="SELECT * FROM scores";
+            String sql = "SELECT * FROM scores";
 
             rs = stmt.executeQuery(sql);
 

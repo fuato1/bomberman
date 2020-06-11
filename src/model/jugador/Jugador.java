@@ -6,6 +6,7 @@ public class Jugador {
 
     public Jugador(String nickName) {
         this.nickName = nickName;
+        this.score = new Puntaje();
     }
 
     /*

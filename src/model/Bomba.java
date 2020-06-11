@@ -1,26 +1,44 @@
 package model;
 
-import javax.imageio.ImageIO;
+import model.explosion.Explosion;
+import model.factory.OGAbstractFactory;
+import model.factory.OGFactoryProducer;
+import model.interfaces.ObjetoCambianteEstatico;
 
-public class Bomba extends ObjetoGrafico implements ObjetoCambiante {
+public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
     private int time = 3;
     private int range = 2;
+    private static boolean active = false;
 
     public Bomba() {
         super("/imagenes/bombas/bomb-1.png");
     }
 
-    // public Explosion detonate() {}
-
     /*
         Getters
     */
     public int getTime() {
-        return time;
+        return this.time;
     }
 
     public int getRange() {
-        return range;
+        return this.range;
+    }
+
+    public static boolean isActive() {
+        return active;
+    }
+
+    /*
+        aca se podria ver de pasar el rango para calcular cuando la
+        explosion debe ser mas corta en ciertas direcciones
+    */
+    public Explosion detonate() {
+        OGAbstractFactory factory = OGFactoryProducer.getFactory();
+        Explosion e = factory.getExplosion();
+        e.setPosition(this.getX(), this.getY());
+
+        return e;
     }
 
     /*
@@ -34,12 +52,33 @@ public class Bomba extends ObjetoGrafico implements ObjetoCambiante {
         this.range = range;
     }
 
+    public static void setActive(boolean active) {
+        Bomba.active = active;
+    }
+
+    /*
+        cambio de sprites
+    */
     @Override
-    public void update(String fileName) {
-        try {
-            image = ImageIO.read(getClass().getResource(fileName));
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void changeSprites() {
+        if(this.ANIMATION_COUNTER > 120) {
+            this.ANIMATION_COUNTER = 120;
+        }
+        else if(this.ANIMATION_COUNTER > 90) {
+            this.update("/imagenes/null.png");
+            this.ANIMATION_COUNTER++;
+        }
+        else {
+            for (int i = 30; i <= 90; i += 30) {
+                if(this.ANIMATION_COUNTER == i)
+                    time--;
+
+                if(i-30 <= this.ANIMATION_COUNTER && this.ANIMATION_COUNTER < i) {
+                    this.update("/imagenes/bombas/bomb-" + i/30 + ".png");
+                }
+            }
+
+            this.ANIMATION_COUNTER++;
         }
     }
 }

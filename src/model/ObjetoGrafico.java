@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 public abstract class ObjetoGrafico {
     protected BufferedImage image; // sprite del OG
     protected Point2D.Double position = new Point2D.Double(); // posicion
+    protected double ANIMATION_COUNTER = 0;
 
     public ObjetoGrafico(String filename) {
         try {
@@ -36,6 +37,17 @@ public abstract class ObjetoGrafico {
 
 	public double getY() {
 		return this.position.getY();
+    }
+
+    public void checkAnimationCounter(int n) {
+        if(ANIMATION_COUNTER > n)
+            ANIMATION_COUNTER = 0;
+        else if(ANIMATION_COUNTER >= n-10) {
+            this.update("/imagenes/null.png");
+            ANIMATION_COUNTER++;
+        }
+        else
+            ANIMATION_COUNTER++;
     }
 
     /*
