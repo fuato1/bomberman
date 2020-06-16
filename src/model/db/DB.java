@@ -7,6 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import model.Ranking;
+import model.jugador.Jugador;
+
 public class DB {
     private static final String DB_PATH = System.getProperty("user.dir") + ".db";
     private static final String SQL_SCORES = "CREATE TABLE IF NOT EXISTS scores \n" +
@@ -21,9 +24,6 @@ public class DB {
             String url = "jdbc:sqlite:" + DB_PATH;
              
             conn = DriverManager.getConnection(url);
-            System.out.println("Conectado a SQLite.");
-
-            // deleteScores();
 
            	stmt = conn.createStatement();
             String sql = SQL_SCORES;
@@ -42,33 +42,15 @@ public class DB {
         }
     }
 
-    public void closeDBConn() {
+    public void selectAllInto(Ranking ranking) {
         try {
-            conn.close();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-
-            try {
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }  
-    }
-
-    public void selectAll(){
-        try {
-            String sql = "SELECT * FROM scores";
-
-            rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery("SELECT * FROM scores ORDER BY score DESC");
 
             while(rs.next()) {
-                System.out.println(
-                    rs.getInt("id") + " " +
-                    rs.getString("playerName") + "\t" + 
-                    rs.getInt("score")
-                );
+                Jugador player = new Jugador(rs.getString("playerName"));
+                player.setScore(rs.getInt("score"));
+
+                ranking.getScores().add(player);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -102,24 +84,24 @@ public class DB {
         }
     }
 
-    public void deleteScore(int id){
-        try {
-            String sql = "DELETE FROM scores WHERE id = ?";
+    // public void deleteScore(int id){
+    //     try {
+    //         String sql = "DELETE FROM scores WHERE id = ?";
 
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+    //         pstmt = conn.prepareStatement(sql);
+    //         pstmt.setInt(1, id);
+    //         pstmt.executeUpdate();
+    //     } catch (SQLException e) {
+    //         System.out.println(e.getMessage());
 
-            try {
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
-    }
+    //         try {
+    //             if (conn != null)
+    //                 conn.close();
+    //         } catch (SQLException ex) {
+    //             System.out.println(ex.getMessage());
+    //         }
+    //     }
+    // }
 
     public void updateScore(int id, String playerName, int score){
         try {

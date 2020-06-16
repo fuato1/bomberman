@@ -26,19 +26,12 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
 
         explosion = new HashMap<String, Vector<ParteExplosion>>(4);
 
-        OGAbstractFactory expFactory = OGFactoryProducer.getFactory();
+        OGAbstractFactory factory = OGFactoryProducer.getFactory();
 
-        explosion.put("up", expFactory.getMidExplosions(EXPLOSION_UP, 1));
-        explosion.get("up").add(expFactory.getTipExplosion(EXPLOSION_UP));
-
-        explosion.put("down", expFactory.getMidExplosions(EXPLOSION_UP, 1));
-        explosion.get("down").add(expFactory.getTipExplosion(EXPLOSION_DOWN));
-
-        explosion.put("left", expFactory.getMidExplosions(EXPLOSION_LEFT, 1));
-        explosion.get("left").add(expFactory.getTipExplosion(EXPLOSION_LEFT));
-
-        explosion.put("right", expFactory.getMidExplosions(EXPLOSION_LEFT, 1));
-        explosion.get("right").add(expFactory.getTipExplosion(EXPLOSION_RIGHT));
+        explosion.put("up", factory.getTipExplosion(EXPLOSION_UP));
+        explosion.put("down", factory.getTipExplosion(EXPLOSION_DOWN));
+        explosion.put("left", factory.getTipExplosion(EXPLOSION_LEFT));
+        explosion.put("right", factory.getTipExplosion(EXPLOSION_RIGHT));
     }
 
     /*
@@ -90,7 +83,7 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
         cambio de sprites
     */
     @Override
-    public void changeSprites() {
+    public void changeObject() {
         if(this.ANIMATION_COUNTER > 60) {
             this.ANIMATION_COUNTER = 60;
             this.vanishedExplosion = true;
@@ -98,7 +91,7 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
         else if(this.ANIMATION_COUNTER >= 50) {
             for (String dir : explosion.keySet()) {
                 for (ParteExplosion pe : explosion.get(dir)) {
-                    pe.changeSprites();
+                    pe.changeObject();
                 }
             }
             this.update("/imagenes/null.png");
@@ -113,7 +106,7 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
     
             for (String dir : explosion.keySet()) {
                 for (ParteExplosion pe : explosion.get(dir)) {
-                    pe.changeSprites();
+                    pe.changeObject();
                 }
             }
 

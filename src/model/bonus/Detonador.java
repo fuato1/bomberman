@@ -19,7 +19,7 @@ public class Detonador extends ObjetoGrafico implements Bonus {
     }
 
     @Override
-    public void changeSprites() {
+    public void changeObject() {
         checkAnimationCounter(20);
 
         if(ANIMATION_COUNTER < 10)

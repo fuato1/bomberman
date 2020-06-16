@@ -1,6 +1,6 @@
 package model.enemigo;
 
-import model.Heroe;
+import java.util.Random;
 
 public class EnemigoRosa extends Enemigo {
     public EnemigoRosa(String fileName) {
@@ -8,12 +8,32 @@ public class EnemigoRosa extends Enemigo {
     }
 
     @Override
-    public void hurtHero(Heroe hero) {
-        System.out.print("El enemigo rosa hirio a Bomberman....");
+    public void changeObject(String dir) {
+        if(ENEMY_MOVING_TIME < 0) {
+            Random r = new Random();
+            CURRENT_DIRECTION = directions[r.nextInt(3)];
+
+            ENEMY_MOVING_TIME = 100;
+        }
+        else {
+            ENEMY_MOVING_TIME--;
+        }
+
+        if(ANIMATION_COUNTER > 30) {
+            ANIMATION_COUNTER = 0;
+        }
+        else {
+            for (int i = 10; i <= 30; i += 10) {
+                if(i-10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i)
+                    update("/imagenes/enemigos/rosa/" + dir + "/enemigo_rosa-" + i/10 + ".png");
+            }
+
+            ANIMATION_COUNTER++;
+        }
     }
 
     @Override
-    public void changeObject(String dir) {
+    public void kill() {
         checkAnimationCounter(70);
         
         for (int i = 10; i <= 50; i += 10) {

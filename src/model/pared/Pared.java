@@ -12,6 +12,6 @@ public class Pared extends ObjetoGrafico implements ObjetoCambianteEstatico {
     }
 
     @Override
-    public void changeSprites() {
+    public void changeObject() {
     }
 }

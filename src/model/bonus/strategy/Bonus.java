@@ -14,14 +14,9 @@ public interface Bonus extends ObjetoCambianteEstatico {
     public final static int PUERTA = 6;
 
     public void activateBonus();
-
     public void bonusHit();
-
     public void draw(Graphics2D g);
-
     public void setPosition(double x, double y);
-
     public void update(String fileName);
-
-    public void changeSprites();
+    public void changeObject();
 }

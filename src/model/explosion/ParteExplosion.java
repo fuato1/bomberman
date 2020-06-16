@@ -12,7 +12,7 @@ public class ParteExplosion extends ObjetoGrafico implements ObjetoCambianteEsta
     }
 
     @Override
-    public void changeSprites() {
+    public void changeObject() {
         if(this.ANIMATION_COUNTER > 60)
             this.ANIMATION_COUNTER = 60;
         else if(this.ANIMATION_COUNTER >= 50) {

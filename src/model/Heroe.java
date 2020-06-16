@@ -1,24 +1,21 @@
 package model;
 
-import java.util.Vector;
-
 import model.bomberman.Bomberman;
 import model.bomberman.Mundo;
-import model.bonus.strategy.Bonus;
 import model.factory.OGAbstractFactory;
 import model.factory.OGFactoryProducer;
 import model.interfaces.ObjetoCambianteMovible;
 
 public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     private int life = 3;
-    private final double HERO_DISPLACEMENT = 200.0;
+    private final double HERO_DISPLACEMENT = 100.0;
+
     private boolean IS_OVER_WALL = false;
     private boolean IS_NEXT_TO_WALL = false;
-    private Vector<Bonus> activeBonus;
+    private boolean IS_DEAD = false;
 
     public Heroe() {
         super("/imagenes/bomberman/down/b_down-1.png");
-        activeBonus = new Vector<Bonus>(0);
     }
 
     /*
@@ -26,6 +23,18 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     */
     public int getLife() {
         return life;
+    }
+
+    public boolean isOverWall() {
+        return IS_OVER_WALL;
+    }
+
+    public boolean isNextToWall() {
+        return IS_NEXT_TO_WALL;
+    }
+
+    public boolean isDead() {
+        return IS_DEAD;
     }
 
     /*
@@ -39,19 +48,12 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
         checkHorizontalMovement();
         checkHorizontalMovement();
 
-        if(!IS_OVER_WALL && !IS_NEXT_TO_WALL) {
-            OGAbstractFactory factory = OGFactoryProducer.getFactory();
-            Bomba b = factory.getBomba();
-            b.setPosition(this.getX(), this.getY());
+        OGAbstractFactory factory = OGFactoryProducer.getFactory();
+        Bomba b = factory.getBomba();
 
-            return b;
-        }
+        b.setPosition(checkHorizontalBombPosition(), checkVerticalBombPosition());        
 
-        return null;
-    }
-
-    public void consumeBonus(Bonus b) {
-        // b.activateBonus();
+        return b;
     }
 
     /*
@@ -74,8 +76,55 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
         }
     }
 
+    @Override
+    public void kill() {
+        if(ANIMATION_COUNTER > 80) {
+            ANIMATION_COUNTER = 80;
+            IS_DEAD = false;
+            setPosition(Bomberman.LEFT_WALL_LIMIT, Bomberman.UPPER_WALL_LIMIT);
+            update("/imagenes/bomberman/down/b_down-1.png");
+        }
+        else if(ANIMATION_COUNTER > 70) {
+            update("/imagenes/null.png");
+            ANIMATION_COUNTER++;
+        }
+        else {
+            for (int i = 10; i <= 70; i += 10) {
+                if(i-10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i) {
+                    update("/imagenes/bomberman/eliminado/bomberman_M" + i/10 + ".png");
+                }
+            }
+
+            ANIMATION_COUNTER++;
+        }
+    }
+
     /*
-        movimiento
+        checkeo para posicionar a las bombas en el centro
+        de las paredes de ladrillo
+    */
+    private int checkHorizontalBombPosition() {
+        for (int i = 0; i < 25; i++) {
+            if(32 + 32*i < getX() + 28 && getX() < 64 + 32*i) {
+                return 32*(i+1);
+            }
+        }
+
+        return 0;
+    }
+
+    private int checkVerticalBombPosition() {
+        for (int i = 0; i < 13; i++) {
+            if(105 + 32*i < getY() + 28 && getY() < 137 + 32*i) {
+                return 105 + 32*i;
+            }
+        }
+
+        return 0;
+    }
+
+    /*
+        checkeo para la posicion del heroe
     */
     private void checkVerticalMovement() {
         for (int i = 0; i < 11; i++) {
@@ -91,6 +140,14 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
                 IS_NEXT_TO_WALL = true;
             }
         }
+    }
+
+    /*
+        movimiento
+    */
+    public void stop() {
+        IS_DEAD = true;
+        life--;
     }
 
     public void up(double delta) {

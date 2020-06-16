@@ -4,17 +4,14 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import model.bomberman.Bomberman;
-import model.interfaces.ObjetoCambianteEstatico;
 
 public class Puntaje {
-    private int score;
+    private int score = 0;
+    private double x;
     private double ANIMATION_COUNTER = 0;
-    private double x, y;
 
     public Puntaje() {
-        this.score = 0;
-        this.x = 500;
-        this.y = Bomberman.UPPER_WALL_LIMIT/2;
+        x = 500;
     }
 
     /*
@@ -25,7 +22,7 @@ public class Puntaje {
     }
 
     public double getX() {
-        return this.x;
+        return x;
     }
 
     /*
@@ -39,14 +36,6 @@ public class Puntaje {
         this.x = x;
     }
 
-    public void draw(Graphics2D g) {
-        g.setColor(Color.black);
-        g.drawString("Puntos: " + this.score, (int) this.x+2, (int) this.y+2);
-
-    	g.setColor(Color.white);
-        g.drawString("Puntos: " + this.score, (int) this.x, (int) this.y);
-    }
-
     public void countScore() {
         if(ANIMATION_COUNTER > 100)
             ANIMATION_COUNTER = 0;
@@ -54,6 +43,14 @@ public class Puntaje {
             ANIMATION_COUNTER++;
 
         if(ANIMATION_COUNTER == 100)
-            this.score++;
+            score++;
+    }
+
+    public void draw(Graphics2D g) {
+        g.setColor(Color.black);
+        g.drawString("Puntos: " + score, (int) x+2, (int) (Bomberman.UPPER_WALL_LIMIT/2)+2);
+
+    	g.setColor(Color.white);
+        g.drawString("Puntos: " + score, (int) x, (int) (Bomberman.UPPER_WALL_LIMIT/2));
     }
 }

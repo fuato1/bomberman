@@ -68,15 +68,25 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
     }
 
     @Override
-    public ParteExplosion getTipExplosion(int id) {
-        if (id == Explosion.EXPLOSION_UP)
-            return new ParteExplosion("/imagenes/explosiones/up/up_exp-1.png", "up");
-        if (id == Explosion.EXPLOSION_DOWN)
-            return new ParteExplosion("/imagenes/explosiones/down/down_exp-1.png", "down");
-        if (id == Explosion.EXPLOSION_LEFT)
-            return new ParteExplosion("/imagenes/explosiones/left/left_exp-1.png", "left");
-        if (id == Explosion.EXPLOSION_RIGHT)
-            return new ParteExplosion("/imagenes/explosiones/right/right_exp-1.png", "right");
+    public Vector<ParteExplosion> getTipExplosion(int id) {
+        Vector<ParteExplosion> tipExp = new Vector<ParteExplosion>(1);
+
+        if (id == Explosion.EXPLOSION_UP) {
+            tipExp.add(new ParteExplosion("/imagenes/explosiones/up/up_exp-1.png", "up"));
+            return tipExp;
+        }
+        if (id == Explosion.EXPLOSION_DOWN) {
+            tipExp.add(new ParteExplosion("/imagenes/explosiones/down/down_exp-1.png", "down"));
+            return tipExp;
+        }
+        if (id == Explosion.EXPLOSION_LEFT) {
+            tipExp.add(new ParteExplosion("/imagenes/explosiones/left/left_exp-1.png", "left"));
+            return tipExp;
+        }
+        if (id == Explosion.EXPLOSION_RIGHT) {
+            tipExp.add(new ParteExplosion("/imagenes/explosiones/right/right_exp-1.png", "right"));
+            return tipExp;
+        }
 
         return null;
     }
@@ -104,7 +114,7 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
         if (id == Enemigo.ENEMIGO_AZUL)
             return new EnemigoAzul("/imagenes/enemigos/azul/enemigo_azul-1.png");
         if (id == Enemigo.ENEMIGO_ROSA)
-            return new EnemigoRosa("/imagenes/enemigos/rosa/enemigo_rosa-1.png");
+            return new EnemigoRosa("/imagenes/enemigos/rosa/left/enemigo_rosa-1.png");
 
         return null;
     }

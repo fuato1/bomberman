@@ -2,11 +2,10 @@ package model.jugador;
 
 public class Jugador {
     private String nickName = "Player";
-    private Puntaje score;
+    private int score;
 
     public Jugador(String nickName) {
         this.nickName = nickName;
-        this.score = new Puntaje();
     }
 
     /*
@@ -16,7 +15,7 @@ public class Jugador {
         return nickName;
     }
 
-    public Puntaje getScore() {
+    public int getScore() {
         return score;
     }
 
@@ -27,7 +26,7 @@ public class Jugador {
         this.nickName = nickName;
     }
 
-    public void setScore(Puntaje score) {
+    public void setScore(int score) {
         this.score = score;
     }
 }

@@ -1,15 +1,8 @@
 package model.enemigo;
 
-import model.Heroe;
-
 public class EnemigoAzul extends Enemigo {
     public EnemigoAzul(String fileName) {
         super(fileName);
-    }
-
-    @Override
-    public void hurtHero(Heroe hero) {
-        System.out.print("El enemigo azul hirio a Bomberman....");
     }
 
     /*
@@ -17,6 +10,11 @@ public class EnemigoAzul extends Enemigo {
     */
     @Override
     public void changeObject(String dir) {
+        
+    }
+
+    @Override
+    public void kill() {
         checkAnimationCounter(40);
         
         if(ANIMATION_COUNTER < 10)

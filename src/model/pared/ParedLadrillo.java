@@ -9,7 +9,7 @@ public class ParedLadrillo extends Pared {
         cambio de sprites
     */
     @Override
-    public void changeSprites() {
+    public void changeObject() {
         checkAnimationCounter(70);
 
         if(ANIMATION_COUNTER < 10)

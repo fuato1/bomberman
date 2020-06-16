@@ -7,23 +7,22 @@ import model.bomberman.Bomberman;
 
 public class Reloj {
     private int time = 200;
+    private double x;
     private double ANIMATION_COUNTER = 0;
-    private double x, y;
 
     public Reloj() {
-        this.x = Bomberman.LEFT_WALL_LIMIT;
-        this.y = Bomberman.UPPER_WALL_LIMIT/2;
+        x = Bomberman.LEFT_WALL_LIMIT;
     }
 
     /*
         Getters
     */
     public int getTime() {
-        return this.time;
+        return time;
     }
 
     public double getX() {
-        return this.x;
+        return x;
     }
 
     /*
@@ -48,13 +47,13 @@ public class Reloj {
     }
 
     public void draw(Graphics2D g) {
-        if(this.time == 0)
-            this.time = 200;
+        if(time == 0)
+            time = 200;
 
         g.setColor(Color.black);
-        g.drawString("Tiempo de Juego: " + time, (int) this.x+2, (int) this.y+2);
+        g.drawString("Tiempo de Juego: " + time, (int) x+2, (int) (Bomberman.UPPER_WALL_LIMIT/2)+2);
 
     	g.setColor(Color.white);
-        g.drawString("Tiempo de Juego: " + time, (int) this.x, (int) this.y);
+        g.drawString("Tiempo de Juego: " + time, (int) x, (int) (Bomberman.UPPER_WALL_LIMIT/2));
     }
 }

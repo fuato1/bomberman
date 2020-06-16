@@ -8,7 +8,7 @@ import model.interfaces.ObjetoCambianteEstatico;
 public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
     private int time = 3;
     private int range = 2;
-    private static boolean active = false;
+    private static boolean IS_ACTIVE = false;
 
     public Bomba() {
         super("/imagenes/bombas/bomb-1.png");
@@ -26,12 +26,11 @@ public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
     }
 
     public static boolean isActive() {
-        return active;
+        return IS_ACTIVE;
     }
 
     /*
-        aca se podria ver de pasar el rango para calcular cuando la
-        explosion debe ser mas corta en ciertas direcciones
+        detonacion de la bomba
     */
     public Explosion detonate() {
         OGAbstractFactory factory = OGFactoryProducer.getFactory();
@@ -53,15 +52,15 @@ public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
         this.range = range;
     }
 
-    public static void setActive(boolean active) {
-        Bomba.active = active;
+    public static void setActive(boolean IS_ACTIVE) {
+        Bomba.IS_ACTIVE = IS_ACTIVE;
     }
 
     /*
         cambio de sprites
     */
     @Override
-    public void changeSprites() {
+    public void changeObject() {
         if(this.ANIMATION_COUNTER > 120) {
             this.ANIMATION_COUNTER = 120;
         }
