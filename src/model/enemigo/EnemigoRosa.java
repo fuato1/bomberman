@@ -10,10 +10,10 @@ public class EnemigoRosa extends Enemigo {
     @Override
     public void changeObject(String dir) {
         if(ENEMY_MOVING_TIME < 0) {
-            Random r = new Random();
-            CURRENT_DIRECTION = directions[r.nextInt(3)];
+            Random r = new Random(System.currentTimeMillis());
+            CURRENT_DIRECTION = directions[r.nextInt(15)%4];
 
-            ENEMY_MOVING_TIME = 100;
+            ENEMY_MOVING_TIME = 30;
         }
         else {
             ENEMY_MOVING_TIME--;

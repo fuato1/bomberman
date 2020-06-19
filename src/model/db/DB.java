@@ -44,7 +44,7 @@ public class DB {
 
     public void selectAllInto(Ranking ranking) {
         try {
-            rs = stmt.executeQuery("SELECT * FROM scores ORDER BY score DESC");
+            rs = stmt.executeQuery("SELECT * FROM scores ORDER BY score DESC LIMIT 10");
 
             while(rs.next()) {
                 Jugador player = new Jugador(rs.getString("playerName"));
@@ -103,42 +103,42 @@ public class DB {
     //     }
     // }
 
-    public void updateScore(int id, String playerName, int score){
-        try {
-            String sql = "UPDATE scores SET playerName = ?,  score = ? WHERE id = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+    // public void updateScore(int id, String playerName, int score){
+    //     try {
+    //         String sql = "UPDATE scores SET playerName = ?,  score = ? WHERE id = ?";
+    //         PreparedStatement pstmt = conn.prepareStatement(sql);
 
-            pstmt.setString(1, playerName);
-            pstmt.setInt(2, score);
-            pstmt.setInt(3, id);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+    //         pstmt.setString(1, playerName);
+    //         pstmt.setInt(2, score);
+    //         pstmt.setInt(3, id);
+    //         pstmt.executeUpdate();
+    //     } catch (SQLException e) {
+    //         System.out.println(e.getMessage());
 
-            try {
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
+    //         try {
+    //             if (conn != null)
+    //                 conn.close();
+    //         } catch (SQLException ex) {
+    //             System.out.println(ex.getMessage());
+    //         }
+    //     }
 
-    }
+    // }
 
-    public void deleteScores() {
-        try {
-            stmt = conn.createStatement();
-            stmt.execute("DROP TABLE scores");
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+    // public void deleteScores() {
+    //     try {
+    //         stmt = conn.createStatement();
+    //         stmt.execute("DROP TABLE scores");
+    //     } catch (SQLException e) {
+    //         System.out.println(e.getMessage());
             
-            try {
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
-    }
+    //         try {
+    //             if (conn != null)
+    //                 conn.close();
+    //         } catch (SQLException ex) {
+    //             System.out.println(ex.getMessage());
+    //         }
+    //     }
+    // }
 }
 

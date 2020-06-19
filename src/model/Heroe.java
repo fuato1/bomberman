@@ -7,7 +7,7 @@ import model.factory.OGFactoryProducer;
 import model.interfaces.ObjetoCambianteMovible;
 
 public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
-    private int life = 3;
+    private int life;
     private final double HERO_DISPLACEMENT = 100.0;
 
     private boolean IS_OVER_WALL = false;
@@ -16,6 +16,7 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
 
     public Heroe() {
         super("/imagenes/bomberman/down/b_down-1.png");
+        this.life = 3;
     }
 
     /*
@@ -51,7 +52,7 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
         OGAbstractFactory factory = OGFactoryProducer.getFactory();
         Bomba b = factory.getBomba();
 
-        b.setPosition(checkHorizontalBombPosition(), checkVerticalBombPosition());        
+        b.setPosition(checkHorizontalBombPosition(), checkVerticalBombPosition());
 
         return b;
     }
@@ -153,7 +154,7 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     public void up(double delta) {
         checkVerticalMovement();
 
-        if(!(getY() < Bomberman.UPPER_WALL_LIMIT+1) && !IS_OVER_WALL) {
+        if(!(getY() < Bomberman.UPPER_WALL_LIMIT+2) && !IS_OVER_WALL) {
             IS_NEXT_TO_WALL = false;
             setPosition(getX(), getY() - HERO_DISPLACEMENT * delta);
         }
@@ -171,7 +172,7 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     public void left(double delta) {
         checkHorizontalMovement();
 
-        if(!(getX() < 33) && !IS_NEXT_TO_WALL) {
+        if(!(getX() < 34) && !IS_NEXT_TO_WALL) {
             IS_OVER_WALL = false;
             setPosition(getX() - HERO_DISPLACEMENT * delta, getY());
         }
@@ -182,7 +183,7 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
 
         checkHorizontalMovement();
 
-        if(!((getX() + getWidth()) > w.getWidth()-33) && !IS_NEXT_TO_WALL) {
+        if(!((getX() + getWidth()) > w.getWidth()-34) && !IS_NEXT_TO_WALL) {
             IS_OVER_WALL = false;
             setPosition(getX() + HERO_DISPLACEMENT * delta, getY());
         }

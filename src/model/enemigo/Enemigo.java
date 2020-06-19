@@ -22,7 +22,7 @@ public abstract class Enemigo extends ObjetoGrafico implements ObjetoCambianteMo
 
     public Enemigo(String filename) {
         super(filename);
-        Random r = new Random();
+        Random r = new Random(System.currentTimeMillis());
         CURRENT_DIRECTION = directions[r.nextInt(3)];
     }
 

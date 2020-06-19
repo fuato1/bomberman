@@ -28,9 +28,13 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
 
         OGAbstractFactory factory = OGFactoryProducer.getFactory();
 
-        explosion.put("up", factory.getTipExplosion(EXPLOSION_UP));
+        explosion.put("up", factory.getMidExplosions(EXPLOSION_UP, 2));
+        explosion.get("up").add(factory.getTipExplosion(EXPLOSION_UP).get(0));
+
         explosion.put("down", factory.getTipExplosion(EXPLOSION_DOWN));
+
         explosion.put("left", factory.getTipExplosion(EXPLOSION_LEFT));
+
         explosion.put("right", factory.getTipExplosion(EXPLOSION_RIGHT));
     }
 

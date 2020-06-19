@@ -19,4 +19,6 @@ public interface Bonus extends ObjetoCambianteEstatico {
     public void setPosition(double x, double y);
     public void update(String fileName);
     public void changeObject();
+    public double getX();
+    public double getY();
 }
