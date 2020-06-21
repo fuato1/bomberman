@@ -25,4 +25,10 @@ public class VidaExtra extends ObjetoGrafico implements Bonus {
         if(ANIMATION_COUNTER < 10)
             update("/imagenes/bonus/vida_extra.png");
     }
+
+    @Override
+    public void hit() {
+        // TODO Auto-generated method stub
+
+    }
 }

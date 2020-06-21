@@ -28,8 +28,7 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
 
         OGAbstractFactory factory = OGFactoryProducer.getFactory();
 
-        explosion.put("up", factory.getMidExplosions(EXPLOSION_UP, 2));
-        explosion.get("up").add(factory.getTipExplosion(EXPLOSION_UP).get(0));
+        explosion.put("up", factory.getTipExplosion(EXPLOSION_UP));
 
         explosion.put("down", factory.getTipExplosion(EXPLOSION_DOWN));
 
@@ -116,5 +115,11 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
 
             this.ANIMATION_COUNTER++;
         }
+    }
+
+    @Override
+    public void hit() {
+        // TODO Auto-generated method stub
+
     }
 }

@@ -12,19 +12,25 @@ import com.entropyinteractive.Keyboard;
 
 import model.Bomba;
 import model.Heroe;
+import model.ObjetoGrafico;
+import model.Puntaje;
 import model.Ranking;
 import model.Reloj;
+import model.Vidas;
+import model.bonus.Puerta;
 import model.bonus.strategy.Bonus;
 import model.db.DB;
 import model.enemigo.Enemigo;
+import model.enemigo.EnemigoAzul;
+import model.enemigo.EnemigoRosa;
 import model.explosion.Explosion;
 import model.explosion.ParteExplosion;
 import model.factory.OGAbstractFactory;
 import model.factory.OGFactoryProducer;
 import model.fx_player.FXPlayer;
 import model.jugador.Jugador;
-import model.jugador.Puntaje;
 import model.pared.Pared;
+import model.pared.ParedLadrillo;
 import model.tests.ConsoleColors;
 
 public class Bomberman extends JGame {
@@ -44,6 +50,7 @@ public class Bomberman extends JGame {
         jugadores (prueba). No esta en UML, ver si va en SistemJuegos
     */
     private Puntaje points;
+    private Vidas life;
     private Jugador player;
 
     /*
@@ -54,7 +61,18 @@ public class Bomberman extends JGame {
     private Mundo world;
     private Camara cam;
     private FXPlayer fx;
+
+    /*
+        representacion del mapa y variables de representacion
+        de cada objeto grafico en el mapa
+    */
     private int[][] mapPositions;
+    private final int STONE_WALL = 1;
+    private final int ENEMY = 2;
+    private final int HERO = 3;
+    private final int BRICK_WALL = 4;
+    private final int BONUS = 5;
+    private final int BOMB = 6;
     
     /*
         limites del escenario
@@ -75,6 +93,7 @@ public class Bomberman extends JGame {
     */
     private boolean PLAY = false;
     private boolean IS_MAIN_SCREEN = true;
+    private boolean END_GAME = false;
 
     /*
         variables de cambio y estado de nivel
@@ -104,6 +123,9 @@ public class Bomberman extends JGame {
                 else if(mapPositions[i][j] == 5) {
                     System.out.print(ConsoleColors.GREEN + mapPositions[i][j] + ConsoleColors.RESET + " ");
                 }
+                else if(mapPositions[i][j] == 6) {
+                    System.out.print(ConsoleColors.CYAN + mapPositions[i][j] + ConsoleColors.RESET + " ");
+                }
                 else {
                     System.out.print(mapPositions[i][j] + " ");
                 }
@@ -120,14 +142,25 @@ public class Bomberman extends JGame {
             cuando se presiona ENTER sobre "Jugar" PLAY = true
         */
         if(!PLAY) {
+            CHANGE_STATE_COUNTER--;
+
             if(IS_MAIN_SCREEN) {
                 mainScreen(g);
+                
+                if(CHANGE_STATE_COUNTER <= 85) {
+                    IS_MAIN_SCREEN = false;
+                }
             }
             else if(IS_CHANGE_STAGE) {
                 changeStage(g);
             }
             else {
-                endScreen(g);
+                rankingScreen(g);
+                
+                if(CHANGE_STATE_COUNTER == 0) {
+                    CHANGE_STATE_COUNTER = 170;
+                    IS_MAIN_SCREEN = true;
+                }
             }
         }
         else {
@@ -186,7 +219,7 @@ public class Bomberman extends JGame {
         // fx.play();
     }
 
-    private void endScreen(Graphics2D g) {
+    private void rankingScreen(Graphics2D g) {
         bg.setImage("/imagenes/end_game.png");
         bg.draw(g);
 
@@ -195,10 +228,12 @@ public class Bomberman extends JGame {
         g.setColor(Color.white);
         g.drawString("Ranking: ", 282, 50);
 
-        g.setColor(Color.black);
-        g.drawString("Press 'R' to play again", 100, 460);
-        g.setColor(Color.white);
-        g.drawString("Press 'R' to play again", 102, 460);
+        if(END_GAME) {
+            g.setColor(Color.black);
+            g.drawString("Press 'R' to play again", 100, 460);
+            g.setColor(Color.white);
+            g.drawString("Press 'R' to play again", 102, 460);
+        }
 
         g.setColor(Color.black);
         g.drawString("Press 'Esc' to exit", 400, 460);
@@ -228,15 +263,19 @@ public class Bomberman extends JGame {
 
         // fx = FXPlayer.STAGE_START;
         // fx.play();
-
-        CHANGE_STATE_COUNTER--;
-
+        
         if(CHANGE_STATE_COUNTER == 0) {
-            PLAY = true;
-            IS_CHANGE_STAGE = false;
-            // fx.stop();
+            if(CURRENT_STAGE == 2) {
+                IS_CHANGE_STAGE = false;
+                // fx.stop();
+            }
+            else {
+                PLAY = true;
+                IS_CHANGE_STAGE = false;
+                // fx.stop();
 
-            gameStartup();
+                gameStartup();
+            }
         }
     }
 
@@ -255,6 +294,9 @@ public class Bomberman extends JGame {
         clock.draw(g);
         points.draw(g);
         hero.draw(g);
+
+        life.setLife(hero.getLife());
+        life.draw(g);
         
         for (Bomba b : bombs) {
             if(b.getTime() > 0) {
@@ -271,7 +313,7 @@ public class Bomberman extends JGame {
                         int row = (int) pe.getY()/32 - 2;
                         int col = (int) pe.getX()/32;
 
-                        if(mapPositions[row][col] == 1) {
+                        if(mapPositions[row][col] == 1 || mapPositions[row][col] == 4) {
                             break;
                         }
 
@@ -319,17 +361,6 @@ public class Bomberman extends JGame {
         Keyboard keyboard = this.getKeyboard();
 
         /*
-            si se presiona la tecla izquierda o derecha se posiciona
-            a la flecha
-        */
-        if (keyboard.isKeyPressed(KeyEvent.VK_LEFT)) {
-            arrow.setPosition(150, 300);
-        }
-        if (keyboard.isKeyPressed(KeyEvent.VK_RIGHT)) {
-            arrow.setPosition(311, 300);
-        }
-
-        /*
             si se presiona enter el juego inicia
         */
         if (keyboard.isKeyPressed(KeyEvent.VK_ENTER)) {
@@ -347,64 +378,11 @@ public class Bomberman extends JGame {
     private void gameScreenUpdate(double delta) {
         Keyboard keyboard = this.getKeyboard();
 
-        for (Bomba b : bombs) {
-            /*
-                si alguna bomba va a explotar
-            */
-            if(b.getTime() == 0) {
-                /*
-                    y hay una explosion menos que cantidad de bombas en el mapa
-                */
-                if(bombs.size()-1 == explosions.size()) {
-                    /*
-                        la bomba detona (instancia una Explosion y la setea en su posicion),
-                        se agrega la explosion al mapa y se da permiso para agregar una nueva bomba
-                    */
-                    explosions.add(b.detonate());
-                    b.setTime(3);
-                    Bomba.setActive(false);
-                }
-            }
-            else {
-                /*
-                    si hace la animacion de la bomba
-                */
-                b.changeObject();
-            }
-        }
-
-        for (int i = 0; i < explosions.size(); i++) {
-            /*
-                si alguna explosion todavia no se desvanecio se
-                sigue con su animacion
-            */
-            if(!explosions.get(i).isVanished()) {
-                explosions.get(i).changeObject();
-            }
-        }
-
         /*
             animaciones del reloj y contador de puntos del jugador
         */
         clock.countTime();
         points.countScore();
-
-         /*
-            se checkea que na haya mas bombas de las que el heroe puede usar (sin bonus)
-        */
-        if(bombs.size() == 2 && !Bomba.isActive()) {
-            /*
-                se checkea que haya bombas y explosiones para ir quitando del mapa
-                y que no haya ninguna explosion activa (solo se puede explotar una bomba y
-                luego colocar otra cuando la anterior se desvanecio)
-            */
-            if(!bombs.isEmpty()) {
-                bombs.remove(0);
-            }
-            if(!explosions.isEmpty()) {
-                explosions.remove(0);
-            }
-        }
         
         /*
             controles de movimiento para el heroe y los enemigos
@@ -416,6 +394,406 @@ public class Bomberman extends JGame {
             si el heroe ya no tiene vidas se pasa a la pantalla de game over donde esta el ranking.
         */
         if(!hero.isDead()) {
+            /*
+                se itera sobre el mapa para setear las posiciones de el heroe y
+                los enemigos en 0 y liberar los espacios por los que se van moviendo
+                
+                adicionalmente se coloca un 1 en las paredes de piedra y 4 en las paredes de
+                ladrillo ya que por problemas de calcula muchas veces los objetos que se mueven
+                setean en 0 posiciones que no deberian.
+
+                otra razon es que haciendo el seteo en el mapa a 0 de las posiciones anteriores
+                de los objetos movibles en los controles de movimiento de los mismos muchas veces deja
+                valores 2 y 3 sobre el mapa invalidos que no son quitados
+            */
+            for (int i = 1; i < 13; i++) { // filas
+                for (int j = 1; j < 25; j++) { // columnas
+                    if(i%2 == 0) { // fila con paredes de piedra
+                        if(j%2 != 0) { // si no hay una pared de piedra central
+                            if(mapPositions[i][j] != 4 && mapPositions[i][j] != 5) { // si no hay paredes de piedra
+                                if(mapPositions[i][j] == 3) { // si es la posicion del heroe
+                                    mapPositions[i][j] = 0;
+                                }
+                                else if(mapPositions[i][j] == 2) { // si es la posicion de un enemigo
+                                    mapPositions[i][j] = 0;
+                                }
+                                else if(mapPositions[i][j] == 6) {
+                                    mapPositions[i][j] = 0;
+                                }
+                            }
+                        }
+                        else { // restaurando posibles seteos en 0 por los objetos movibles
+                            mapPositions[i][j] = 1;
+                        }
+                    }
+                    else { // fila sin paredes de piedra
+                        if(mapPositions[i][j] != 4 && mapPositions[i][j] != 5) { // si no hay paredes de ladrillo
+                            if(mapPositions[i][j] == 3) { // si es la posicion del heroe
+                                mapPositions[i][j] = 0;
+                            }
+                            else if(mapPositions[i][j] == 2) { // si es la posicion de un enemigo
+                                mapPositions[i][j] = 0;
+                            }
+                            else if(mapPositions[i][j] == 6) {
+                                mapPositions[i][j] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            int row;
+            int col;
+
+            for (Bomba b : bombs) {
+                /*
+                    si alguna bomba va a explotar
+                */
+                if(b.getTime() == 0) {
+                    /*
+                        y hay una explosion menos que cantidad de bombas en el mapa
+                    */
+                    if(bombs.size()-1 == explosions.size()) {
+                        /*
+                            la bomba detona (instancia una Explosion y la setea en su posicion),
+                            se agrega la explosion al mapa y se da permiso para agregar una nueva bomba
+                        */
+                        explosions.add(b.detonate());
+                        Bomba.setActive(false);
+                    }
+                }
+                else {
+                    /*
+                        se hace la animacion de la bomba
+                    */
+                    b.changeObject();
+
+                    if(b.getTime() > 0) {
+                        setOnMap(b);
+                    }
+                }
+            }
+
+            /*
+                se setea en el mapa la posicion actual del heroe con un 3
+                (habiendo borrado anteriormente la ultima posicion en la que
+                se encontraba)
+            */
+            setOnMap(hero);
+
+             /*
+                movimiento de los enemigos
+            */
+            for (Enemigo e : enemies) {
+                /*
+                    si el enemigo no esta muerto (esto por ahora se usa por controles de testeo,
+                    lo ideal es quitarlo del vector una vez que fue tocado por una explosion)
+                */
+                if(!e.isDead()) {
+                    /*
+                        cambio de sprites segun la direccion que toma el enemigo
+                        (el enemigo toma direcciones de forma aleatoria)
+                    */
+                    e.changeObject(e.getCurrentDirection());
+
+                    /*
+                        se setea en el mapa la posicion actual del enemigo con un 2
+                        (habiendo borrado anteriormente la ultima posicion en la que
+                        se encontraba)
+                    */
+                    setOnMap(e);
+
+                    if(e.getCurrentDirection() == "up") {
+                        /*
+                            file y columna actual (con modificaciones con respecto al mapa
+                            porque sino genera superposiciones entre sprites)
+                        */
+                        row = (int) (e.getY()+20)/32 - 2;
+                        col = (int) e.getX()/32;
+
+                        /*
+                            si la posicion de arriba no es una pared de piedra
+                        */
+                        if(
+                            mapPositions[row-1][col] != 1 && 
+                            mapPositions[row-1][col] != 4 && 
+                            mapPositions[row-1][col] != 5 &&
+                            mapPositions[row-1][col] != 6) {
+                            e.up(delta);
+                        }
+                        /*
+                            si la posicion de arriba es el heroe
+                        */
+                        if(mapPositions[row-1][col] == 3) {
+                            hero.stop();
+                        }
+                    }
+                    if(e.getCurrentDirection() == "down") {
+                        /*
+                            file y columna actual (con modificaciones con respecto al mapa
+                            porque sino genera superposiciones entre sprites)
+                        */
+                        row = (int) (e.getY()-10) / 32 - 2;
+                        col = (int) e.getX() / 32;
+
+                        /*
+                            si la posicion de arriba no es una pared de piedra
+                        */
+                        if(
+                            mapPositions[row+1][col] != 1 && 
+                            mapPositions[row+1][col] != 4 && 
+                            mapPositions[row+1][col] != 5 &&
+                            mapPositions[row+1][col] != 6) {
+                            e.down(delta);
+                        }
+                        /*
+                            si la posicion de arriba es el heroe
+                        */
+                        if(mapPositions[row+1][col] == 3) {
+                            hero.stop();
+                        }
+                    }
+                    if(e.getCurrentDirection() == "left") {
+                        /*
+                            file y columna actual (con modificaciones con respecto al mapa
+                            porque sino genera superposiciones entre sprites)
+                        */
+                        row = (int) e.getY() / 32 - 2;
+                        col = (int) (e.getX()+30) / 32;
+
+                        /*
+                            si la posicion de arriba no es una pared de piedra
+                        */
+                        if(
+                            mapPositions[row][col-1] != 1 && 
+                            mapPositions[row][col-1] != 4 && 
+                            mapPositions[row][col-1] != 5 &&
+                            mapPositions[row][col-1] != 6) {
+                            e.left(delta);
+                        }
+                        /*
+                            si la posicion de arriba es el heroe
+                        */
+                        if(mapPositions[row][col-1] == 3) {
+                            hero.stop();
+                        }
+                    }
+                    if(e.getCurrentDirection() == "right") {
+                        /*
+                            file y columna actual (con modificaciones con respecto al mapa
+                            porque sino genera superposiciones entre sprites)
+                        */
+                        row = (int) (e.getY()+14) / 32 - 2;
+                        col = (int) (e.getX()) / 32;
+
+                        /*
+                            si la posicion de arriba no es una pared de piedra
+                        */
+                        if(
+                            mapPositions[row][col+1] != 1 && 
+                            mapPositions[row][col+1] != 4 && 
+                            mapPositions[row][col+1] != 5 &&
+                            mapPositions[row][col+1] != 6) {
+                            e.right(delta);
+                        }
+                        /*
+                            si la posicion de arriba es el heroe
+                        */
+                        if(mapPositions[row][col+1] == 3) {
+                            hero.stop();
+                        }
+                    }
+                }
+            }
+
+            /*
+                movimiento de heroe, los comentarios para los enemigos aplican
+                para el heroe. Se cambian los sprites segun una direccion, se calcula la fila y columna actual
+                (con alguna modificaciones por superposicion de sprites), se checkea si el heroe va a chocar
+                contra un enemigo (en ese caso perdera una vida) y se checkea que no pase por las paredes de
+                ladrillo
+            */
+            if(keyboard.isKeyPressed(KeyEvent.VK_UP)) {
+                hero.changeObject("up");
+
+                row = (int) ((hero.getY()+20)/32 - 2);
+                col = (int) (hero.getX()/32);
+
+                if(mapPositions[row-1][col] == 2) {
+                    hero.stop();
+                }
+                else if(
+                    mapPositions[row-1][col] != 1 && 
+                    mapPositions[row-1][col] != 4 && 
+                    mapPositions[row-1][col] != 5 &&
+                    mapPositions[row-1][col] != 6) {
+                    hero.up(delta);
+                }
+            }
+
+            if(keyboard.isKeyPressed(KeyEvent.VK_DOWN)) {
+                hero.changeObject("down");
+
+                row = (int) ((hero.getY()-10)/32 - 2);
+                col = (int) (hero.getX()/32);
+
+                if(mapPositions[row+1][col] == 2) {
+                    hero.stop();
+                }
+                else if(
+                    mapPositions[row+1][col] != 1 &&
+                    mapPositions[row+1][col] != 4 && 
+                    mapPositions[row+1][col] != 5 &&
+                    mapPositions[row+1][col] != 6) {
+                    hero.down(delta);
+                }
+            }
+
+            if(keyboard.isKeyPressed(KeyEvent.VK_LEFT)) {
+                hero.changeObject("left");
+
+                row = (int) (hero.getY()/32 - 2);
+                col = (int) ((hero.getX()+30) / 32);
+
+                if(mapPositions[row][col-1] == 2) {
+                    hero.stop();
+                }
+                else if(
+                    mapPositions[row][col-1] != 1 && 
+                    mapPositions[row][col-1] != 4 && 
+                    mapPositions[row][col-1] != 5 &&
+                    mapPositions[row][col-1] != 6) {
+                    hero.left(delta);
+                }
+            }
+
+            if(keyboard.isKeyPressed(KeyEvent.VK_RIGHT)) {
+                hero.changeObject("right");
+
+                row = (int) ((hero.getY()+14)/32 - 2);
+                col = (int) (hero.getX()/32);
+
+                if(mapPositions[row][col+1] == 2) {
+                    hero.stop();
+                }
+                else if(
+                    mapPositions[row][col+1] != 1 && 
+                    mapPositions[row][col+1] != 4 && 
+                    mapPositions[row][col+1] != 5 &&
+                    mapPositions[row][col+1] != 6) {
+                    hero.right(delta);
+                }
+            }
+    
+            for (Explosion e : explosions) {
+                /*
+                    si alguna explosion todavia no se desvanecio se
+                    sigue con su animacion
+                */
+                if(!e.isVanished()) {
+                    e.changeObject();
+
+                    row = (int) ((e.getY()+16)/32 - 2);
+                    col = (int) ((e.getX()+16)/32);
+    
+                    if(mapPositions[row][col] == 3) {
+                        hero.stop();
+                    }
+                    if(mapPositions[row][col] == 2) {
+                        for (int i = 0; i < enemies.size(); i++) {
+                            if(isInside(e, enemies.get(i))) {
+                                enemies.get(i).kill();
+                                enemies.remove(i);
+                                i--;
+                            }   
+                        }
+                    }
+    
+                    for (Vector<ParteExplosion> vDir : e.getExplosion().values()) {
+                        for (ParteExplosion pe : vDir) {
+                            row = (int) ((pe.getY()+16)/32 - 2);
+                            col = (int) ((pe.getX()+16)/32);
+                            
+                            /*
+                                si el heroe esta dentro de la explosion
+                            */
+                            if(isInside(pe, hero)) {
+                                hero.stop();
+                            }
+                            if(mapPositions[row][col] == 2) {          
+                                for (int i = 0; i < enemies.size(); i++) {
+                                    if(isInside(pe, enemies.get(i))) {
+                                        enemies.get(i).kill();
+                                        enemies.remove(i);
+                                        i--;
+                                    }   
+                                }
+                            }
+                            if(mapPositions[row][col] == 1 || mapPositions[row][col] == 4 || mapPositions[row][col] == 5) {
+                                if(mapPositions[row][col] == 4 || mapPositions[row][col] == 5) {
+                                    for (Pared bw : brickWalls) {
+                                        if(isInside(pe, bw)) {
+                                            bw.hit();
+                                            mapPositions[row][col] = 0;
+                                            break;                                            
+                                        }
+                                    }
+                                }
+                                
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < brickWalls.size(); i++) {
+                if(brickWalls.get(i).wasDestroyed()) {
+                    brickWalls.remove(brickWalls.get(i));
+                }
+                else if(!brickWalls.get(i).wasDestroyed() && brickWalls.get(i).wasHit()) {
+                    brickWalls.get(i).changeObject();
+                }
+            }
+
+            for (Bonus b : bonus) {
+                row = (int) ((b.getY()+16)/32 - 2);
+                col = (int) ((b.getX()+16)/32);
+                mapPositions[row][col] = BONUS;
+
+                if(b.getClass() == Puerta.class) {
+                    if(
+                        mapPositions[row-1][col] == 3 ||
+                        mapPositions[row+1][col] == 3 ||
+                        mapPositions[row][col-1] == 3 ||
+                        mapPositions[row][col+1] == 3
+                    ) {
+                        PLAY = false;
+                        CURRENT_STAGE++;
+                        CHANGE_STATE_COUNTER = 170;
+                        IS_CHANGE_STAGE = true;
+                        END_GAME = true;
+                    }
+                }
+            }
+
+            /*
+                se checkea que na haya mas bombas de las que el heroe puede usar (sin bonus)
+            */
+            if(bombs.size() <= 2 && !Bomba.isActive()) {
+                /*
+                    se checkea que haya bombas y explosiones para ir quitando del mapa
+                    y que no haya ninguna explosion activa (solo se puede explotar una bomba y
+                    luego colocar otra cuando la anterior se desvanecio)
+                */
+                if(!bombs.isEmpty()) {
+                    bombs.remove(0);
+                }
+                if(!explosions.isEmpty()) {
+                    explosions.remove(0);
+                }
+            }
+
             /*
                 tecla para mostrar el mapa por consola (solo para test)
             */
@@ -452,248 +830,19 @@ public class Bomberman extends JGame {
                     }
                 }
             }
-
-            /*
-                se itera sobre el mapa para setear las posiciones de el heroe y
-                los enemigos en 0 y liberar los espacios por los que se van moviendo
-                
-                adicionalmente se coloca un 1 en las paredes de piedra y 4 en las paredes de
-                ladrillo ya que por problemas de calcula muchas veces los objetos que se mueven
-                setean en 0 posiciones que no deberian.
-
-                otra razon es que haciendo el seteo en el mapa a 0 de las posiciones anteriores
-                de los objetos movibles en los controles de movimiento de los mismos muchas veces deja
-                valores 2 y 3 sobre el mapa invalidos que no son quitados
-            */
-            for (int i = 1; i < 13; i++) { // filas
-                for (int j = 1; j < 25; j++) { // columnas
-                    if(i%2 == 0) { // fila con pared de piedra
-                        if(j%2 != 0) { // si no hay una pared de piedra central
-                            if(mapPositions[i][j] != 1) { // si no hay paredes de piedra
-                                if(mapPositions[i][j] == 3) { // si es la posicion del heroe
-                                    mapPositions[i][j] = 0;
-                                }
-                                else if(mapPositions[i][j] == 2) { // si es la posicion de un enemigo
-                                    mapPositions[i][j] = 0;
-                                }
-                            }
-                        }
-                        else { // restaurando posibles seteos en 0 por los objetos movibles
-                            if(mapPositions[i][j] != 5) {
-                                mapPositions[i][j] = 1; 
-                            }
-                        }
-                    }
-                    else { // fila sin pared de ladrillo
-                        if(mapPositions[i][j] != 1) { // si no hay paredes de piedra
-                            if(mapPositions[i][j] == 3) { // si es la posicion del heroe
-                                mapPositions[i][j] = 0;
-                            }
-                            else if(mapPositions[i][j] == 2) { // si es la posicion de un enemigo
-                                mapPositions[i][j] = 0;
-                            }
-                        }
-                    }
-                }
-            }
-
-            /*
-                se setea en el mapa la posicion actual del heroe con un 3
-                (habiendo borrado anteriormente la ultima posicion en la que
-                se encontraba)
-            */
-            int heroRow = (int) ((hero.getY()+16)/32 - 2);
-            int heroCol = (int) ((hero.getX()+16)/32);
-            mapPositions[heroRow][heroCol] = 3;
-
-             /*
-                movimiento de los enemigos
-            */
-            for (Enemigo e : enemies) {
-                /*
-                    cambio de sprites segun la direccion que toma el enemigo
-                    (el enemigo toma direcciones de forma aleatoria)
-                */
-                e.changeObject(e.getCurrentDirection());
-
-                /*
-                    se setea en el mapa la posicion actual del enemigo con un 2
-                    (habiendo borrado anteriormente la ultima posicion en la que
-                    se encontraba)
-                */
-                int eRow = (int) ((e.getY()+16)/32 - 2);
-                int eCol = (int) ((e.getX()+16)/32);
-                mapPositions[eRow][eCol] = 2;
-
-                /*
-                    si el enemigo no esta muerto (esto por ahora se usa por controles de testeo,
-                    lo ideal es quitarlo del vector una vez que fue tocado por una explosion)
-                */
-                if(!e.isDead()) {
-                    if(e.getCurrentDirection() == "up") {
-                        /*
-                            file y columna actual (con modificaciones con respecto al mapa
-                            porque sino genera superposiciones entre sprites)
-                        */
-                        int row = (int) (e.getY()+20)/32 - 2;
-                        int col = (int) e.getX()/32;
-
-                        /*
-                            si la posicion de arriba no es una pared de piedra
-                        */
-                        if(mapPositions[row-1][col] != 1) {
-                            e.up(delta);
-                        }
-                        /*
-                            si la posicion de arriba es el heroe
-                        */
-                        if(mapPositions[row-1][col] == 3) {
-                            hero.stop();
-                        }
-                    }
-                    if(e.getCurrentDirection() == "down") {
-                        /*
-                            file y columna actual (con modificaciones con respecto al mapa
-                            porque sino genera superposiciones entre sprites)
-                        */
-                        int row = (int) (e.getY()-10) / 32 - 2;
-                        int col = (int) e.getX() / 32;
-
-                        /*
-                            si la posicion de arriba no es una pared de piedra
-                        */
-                        if(mapPositions[row+1][col] != 1) {
-                            e.down(delta);
-                        }
-                        /*
-                            si la posicion de arriba es el heroe
-                        */
-                        if(mapPositions[row+1][col] == 3) {
-                            hero.stop();
-                        }
-                    }
-                    if(e.getCurrentDirection() == "left") {
-                        /*
-                            file y columna actual (con modificaciones con respecto al mapa
-                            porque sino genera superposiciones entre sprites)
-                        */
-                        int row = (int) e.getY() / 32 - 2;
-                        int col = (int) (e.getX()+30) / 32;
-
-                        /*
-                            si la posicion de arriba no es una pared de piedra
-                        */
-                        if(mapPositions[row][col-1] != 1) {
-                            e.left(delta);
-                        }
-                        /*
-                            si la posicion de arriba es el heroe
-                        */
-                        if(mapPositions[row][col-1] == 3) {
-                            hero.stop();
-                        }
-                    }
-                    if(e.getCurrentDirection() == "right") {
-                        /*
-                            file y columna actual (con modificaciones con respecto al mapa
-                            porque sino genera superposiciones entre sprites)
-                        */
-                        int row = (int) (e.getY()+14) / 32 - 2;
-                        int col = (int) (e.getX()) / 32;
-
-                        /*
-                            si la posicion de arriba no es una pared de piedra
-                        */
-                        if(mapPositions[row][col+1] != 1) {
-                            e.right(delta);
-                        }
-                        /*
-                            si la posicion de arriba es el heroe
-                        */
-                        if(mapPositions[row][col+1] == 3) {
-                            hero.stop();
-                        }
-                    }
-                }
-            }
-
-            /*
-                movimiento de heroe, los comentarios para los enemigos aplican
-                para el heroe. Se cambian los sprites segun una direccion, se calcula la fila y columna actual
-                (con alguna modificaciones por superposicion de sprites), se checkea si el heroe va a chocar
-                contra un enemigo (en ese caso perdera una vida) y se checkea que no pase por las paredes de
-                ladrillo
-
-                !IMPORTANTE!
-                Segun la version de Nico las paredes de ladrillo tienen el 4 como id. Hay que cambiar eso en
-                la condicion else if
-            */
-            if(keyboard.isKeyPressed(KeyEvent.VK_UP)) {
-                hero.changeObject("up");
-
-                int row = (int) ((hero.getY()+20)/32 - 2);
-                int col = (int) (hero.getX()/32);
-
-                if(mapPositions[row-1][col] == 2) {
-                    hero.stop();
-                }
-                else if(mapPositions[row-1][col] != 1) {
-                    hero.up(delta);
-                }
-            }
-
-            if(keyboard.isKeyPressed(KeyEvent.VK_DOWN)) {
-                hero.changeObject("down");
-
-                int row = (int) ((hero.getY()-10)/32 - 2);
-                int col = (int) (hero.getX()/32);
-
-                if(mapPositions[row+1][col] == 2) {
-                    hero.stop();
-                }
-                else if(mapPositions[row+1][col] != 1) {
-                    hero.down(delta);
-                }
-            }
-
-            if(keyboard.isKeyPressed(KeyEvent.VK_LEFT)) {
-                hero.changeObject("left");
-
-                int row = (int) (hero.getY()/32 - 2);
-                int col = (int) ((hero.getX()+30) / 32);
-
-                if(mapPositions[row][col-1] == 2) {
-                    hero.stop();
-                }
-                else if(mapPositions[row][col-1] != 1) {
-                    hero.left(delta);
-                }
-            }
-
-            if(keyboard.isKeyPressed(KeyEvent.VK_RIGHT)) {
-                hero.changeObject("right");
-
-                int row = (int) ((hero.getY()+14)/32 - 2);
-                int col = (int) (hero.getX()/32);
-
-                if(mapPositions[row][col+1] == 2) {
-                    hero.stop();
-                }
-                else if(mapPositions[row][col+1] != 1) {
-                    hero.right(delta);
-                }
-            }
     
-            cam.followUpperPanel(clock, points);
+            cam.followUpperPanel(clock, points, life);
             cam.followHero(hero);
         }
         else {
             if(hero.getLife() > 0) {
                 hero.kill();
+                life.setLife(hero.getLife());
             }
             else {
                 PLAY = false;
                 IS_MAIN_SCREEN = false;
+                END_GAME = true;
 
                 /*
                     ver puntaje del juagador y si entra en el ranking
@@ -709,9 +858,49 @@ public class Bomberman extends JGame {
         }
     }
 
+    private void setOnMap(ObjetoGrafico o) {
+        int row = (int) ((o.getY()+16)/32 - 2);
+        int col = (int) ((o.getX()+16)/32);
+
+        if(o.getClass() == Pared.class) {
+            mapPositions[row][col] = STONE_WALL;
+        }
+        else if(o.getClass() == Heroe.class) {
+            mapPositions[row][col] = HERO;
+        }
+        else if(o.getClass() == EnemigoRosa.class || o.getClass() == EnemigoAzul.class) {
+            mapPositions[row][col] = ENEMY;
+        }
+        else if(o.getClass() == ParedLadrillo.class) {
+            mapPositions[row][col] = BRICK_WALL;
+        }
+        else if(o.getClass() == Bomba.class) {
+            mapPositions[row][col] = BOMB;
+        }
+    }
+
+    private boolean isInside(ObjetoGrafico o1, ObjetoGrafico o2) {
+        /*
+            variables de checkeo para ver si el heroe esta dentro de
+            la explosion
+        */
+        boolean INSIDE_LEFT_RIGHT = 
+            (o1.getX() <= o2.getX() && o2.getX() <= o1.getX()+32 ||
+            o1.getX() <= o2.getX()+32 && o2.getX()+32 <= o1.getX()+32) &&
+            o1.getY() <= o2.getY()+16 && o2.getY()+16 <= o1.getY()+32;
+
+        boolean INSIDE_UP_DOWN =
+            (o1.getY() <= o2.getY()+28 && o2.getY()+28 <= o1.getY()+32 ||
+            o1.getY() <= o2.getY() && o2.getY() <= o1.getY()+32) &&
+            o1.getX() <= o2.getX()+16 && o2.getX()+16 <= o1.getX()+32;
+
+        return INSIDE_LEFT_RIGHT || INSIDE_UP_DOWN;
+    }
+
     private void getRaking() {
         DB sqlt = new DB();
         sqlt.initDBConn();
+        ranking.getScores().removeAllElements();
         sqlt.selectAllInto(ranking);
 
         for (int i = 1; i < ranking.getScores().size(); i++) {
@@ -738,7 +927,10 @@ public class Bomberman extends JGame {
             world = Mundo.getInstance();
 
             arrow = new Flecha("/imagenes/arrow.png");
-            arrow.setPosition(150, 300);
+            arrow.setPosition(240, 365);
+
+            ranking = new Ranking();
+            getRaking();
         }
         else {
             /*
@@ -753,8 +945,8 @@ public class Bomberman extends JGame {
             bombs = new Vector<Bomba>(0);
             explosions = new Vector<Explosion>(0);
             clock = new Reloj();
-            ranking = new Ranking();
             points = new Puntaje();
+            life = new Vidas();
             player = new Jugador();
 
             /*
@@ -765,10 +957,14 @@ public class Bomberman extends JGame {
             walls.addAll(factory.getParedes(Pared.PARED_PIEDRA, BORDER_WALLS + INTERIOR_WALLS));
             brickWalls.addAll(factory.getParedes(Pared.PARED_LADRILLO, 30));
 
-            enemies.addAll(factory.getEnemigos(Enemigo.ENEMIGO_ROSA, 6));
+            enemies.addAll(factory.getEnemigos(Enemigo.ENEMIGO_ROSA, 1));
 
+            /*
+                eligiendo dos bonus de forma aleatoria
+            */
             bonus.add(factory.getBonus(r.nextInt(6)));
             bonus.add(factory.getBonus(r.nextInt(6)));
+            bonus.add(factory.getBonus(Bonus.PUERTA));
 
             /*
                 posicionando heroe
@@ -840,7 +1036,7 @@ public class Bomberman extends JGame {
                 }
 
                 bw.setPosition(x, y);
-                mapPositions[row][col] = 1;
+                mapPositions[row][col] = 4;
             }
 
             /*
@@ -854,7 +1050,7 @@ public class Bomberman extends JGame {
                 int col = (int) (b.getX()/32);
 
                 while(mapPositions[row][col] == 5) {
-                    bw = brickWalls.get(r.nextInt(30));
+                    bw = brickWalls.get(r.nextInt(2));
                     b.setPosition(bw.getX(), bw.getY());
 
                     row = (int) (b.getY()/32 - 2);
@@ -876,8 +1072,9 @@ public class Bomberman extends JGame {
 
                 boolean NULL_WALL_POS = mapPositions[row][col] == 1;
                 boolean NULL_HERO_POS = mapPositions[row][col] == 3;
+                boolean NULL_BRICK_WALL_POS = mapPositions[row][col] == 4;
 
-                while(NULL_WALL_POS || NULL_HERO_POS) {
+                while(NULL_WALL_POS || NULL_HERO_POS || NULL_BRICK_WALL_POS) {
                     x = LEFT_WALL_LIMIT + 32*(2 * (r.nextInt(11)));
                     y = UPPER_WALL_LIMIT + 32*(2 * (r.nextInt(5)));
     
@@ -886,6 +1083,7 @@ public class Bomberman extends JGame {
 
                     NULL_WALL_POS = mapPositions[row][col] == 1;
                     NULL_HERO_POS = mapPositions[row][col] == 3;
+                    NULL_BRICK_WALL_POS = mapPositions[row][col] == 4;
                 }
 
                 e.setPosition(x, y);

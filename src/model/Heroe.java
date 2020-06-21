@@ -106,7 +106,11 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     */
     private int checkHorizontalBombPosition() {
         for (int i = 0; i < 25; i++) {
-            if(32 + 32*i < getX() + 28 && getX() < 64 + 32*i) {
+            boolean INSIDE_LEFT_RIGHT = 
+                32*(i+1) <= getX() && getX() <= 32*(i+2) ||
+                32*(i+1) <= getX()+32 && getX()+32 <= 32*(i+2);
+
+            if(INSIDE_LEFT_RIGHT) {
                 return 32*(i+1);
             }
         }
@@ -116,7 +120,11 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
 
     private int checkVerticalBombPosition() {
         for (int i = 0; i < 13; i++) {
-            if(105 + 32*i < getY() + 28 && getY() < 137 + 32*i) {
+            boolean INSIDE_UP_DOWN =
+                105 + 32*i <= getY()+28 && getY()+28 <= 137 + 32*i ||
+                105 + 32*i <= getY() && getY() <= 137 + 32*i;
+
+            if(INSIDE_UP_DOWN) {
                 return 105 + 32*i;
             }
         }

@@ -81,4 +81,10 @@ public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
             this.ANIMATION_COUNTER++;
         }
     }
+
+    @Override
+    public void hit() {
+        // TODO Auto-generated method stub
+
+    }
 }

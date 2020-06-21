@@ -25,4 +25,10 @@ public class RangoExplosion extends ObjetoGrafico implements Bonus {
         if(ANIMATION_COUNTER < 10)
             update("/imagenes/bonus/rango_explosion.png");
     }
+
+    @Override
+    public void hit() {
+        // TODO Auto-generated method stub
+
+    }
 }

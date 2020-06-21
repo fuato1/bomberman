@@ -28,4 +28,10 @@ public class ParteExplosion extends ObjetoGrafico implements ObjetoCambianteEsta
             this.ANIMATION_COUNTER++;
         }
     }
+
+    @Override
+    public void hit() {
+        // TODO Auto-generated method stub
+
+    }
 }

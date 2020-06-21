@@ -5,7 +5,7 @@ import model.bonus.strategy.Bonus;
 
 public class SaltoBomba extends ObjetoGrafico implements Bonus {
     public SaltoBomba() {
-        super("/imagenes/bonus/salto_bomba.png");
+        super("/imagenes/bonus/saltar_bomba.png");
     }
 
     @Override
@@ -24,5 +24,11 @@ public class SaltoBomba extends ObjetoGrafico implements Bonus {
 
         if(ANIMATION_COUNTER < 10)
             update("/imagenes/bonus/salto_bomba.png");
+    }
+
+    @Override
+    public void hit() {
+        // TODO Auto-generated method stub
+
     }
 }

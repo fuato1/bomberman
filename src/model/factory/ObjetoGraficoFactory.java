@@ -112,7 +112,7 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
     @Override
     public Enemigo getEnemigo(int id) {
         if (id == Enemigo.ENEMIGO_AZUL)
-            return new EnemigoAzul("/imagenes/enemigos/azul/enemigo_azul-1.png");
+            return new EnemigoAzul("/imagenes/enemigos/azul/left/enemigo_azul-1.png");
         if (id == Enemigo.ENEMIGO_ROSA)
             return new EnemigoRosa("/imagenes/enemigos/rosa/left/enemigo_rosa-1.png");
 

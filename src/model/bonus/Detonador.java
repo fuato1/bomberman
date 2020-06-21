@@ -25,4 +25,10 @@ public class Detonador extends ObjetoGrafico implements Bonus {
         if(ANIMATION_COUNTER < 10)
             update("/imagenes/bonus/detonador.png");
     }
+
+    @Override
+    public void hit() {
+        // TODO Auto-generated method stub
+
+    }
 }
