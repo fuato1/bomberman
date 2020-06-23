@@ -87,24 +87,24 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
     */
     @Override
     public void changeObject() {
-        if(this.ANIMATION_COUNTER > 60) {
-            this.ANIMATION_COUNTER = 60;
-            this.vanishedExplosion = true;
+        if(ANIMATION_COUNTER > 60) {
+            ANIMATION_COUNTER = 60;
+            vanishedExplosion = true;
         }
-        else if(this.ANIMATION_COUNTER >= 50) {
+        else if(ANIMATION_COUNTER >= 50) {
             for (String dir : explosion.keySet()) {
                 for (ParteExplosion pe : explosion.get(dir)) {
                     pe.changeObject();
                 }
             }
-            this.update("/imagenes/null.png");
+            update("/imagenes/null.png");
             
-            this.ANIMATION_COUNTER++;
+            ANIMATION_COUNTER++;
         }
         else {
             for (int i = 10; i <= 40; i += 10) {
-                if(i-10 <= this.ANIMATION_COUNTER && this.ANIMATION_COUNTER < i)
-                    this.update("/imagenes/explosiones/center/center_exp-" + (50-i)/10 + ".png");
+                if(i-10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i)
+                    update("/imagenes/explosiones/center/center_exp-" + (50-i)/10 + ".png");
             }
     
             for (String dir : explosion.keySet()) {
@@ -113,7 +113,7 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
                 }
             }
 
-            this.ANIMATION_COUNTER++;
+            ANIMATION_COUNTER++;
         }
     }
 

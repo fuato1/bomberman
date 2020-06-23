@@ -14,7 +14,7 @@ public class ParedLadrillo extends Pared {
             ANIMATION_COUNTER = 70;
             this.WAS_DESTROYED = true;
         }
-        else if(ANIMATION_COUNTER >= 60) {
+        else if(ANIMATION_COUNTER > 60) {
             this.update("/imagenes/null.png");
             ANIMATION_COUNTER++;
         }

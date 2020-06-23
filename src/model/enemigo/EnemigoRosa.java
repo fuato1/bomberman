@@ -35,10 +35,11 @@ public class EnemigoRosa extends Enemigo {
     @Override
     public void kill() {
         if(ANIMATION_COUNTER > 70) {
-            ANIMATION_COUNTER = 0;
+            ANIMATION_COUNTER = 70;
+            IS_DEAD = true;
         }
         else if(ANIMATION_COUNTER >= 60) {
-            this.update("/imagenes/null.png");
+            update("/imagenes/null.png");
             ANIMATION_COUNTER++;
         }
         else {

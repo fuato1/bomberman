@@ -7,9 +7,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import model.properties.controller.SettingsController;
-import model.properties.view.views_listeners.ScreenStateListener;
 
-public class SettingsView extends JPanel implements ScreenStateListener {
+public class SettingsView extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // instancia de la interfaz
@@ -27,7 +26,6 @@ public class SettingsView extends JPanel implements ScreenStateListener {
         SettingsController.readSettings();
 
         optionsPanel = new OptionsPanel(new GridBagLayout());
-        optionsPanel.addScreenStateListener(this);
 
         buttonsPanel = new ButtonsPanel(new GridBagLayout());
         buttonsPanel.addButtonListener(optionsPanel);

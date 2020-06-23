@@ -13,19 +13,19 @@ public class ParteExplosion extends ObjetoGrafico implements ObjetoCambianteEsta
 
     @Override
     public void changeObject() {
-        if(this.ANIMATION_COUNTER > 60)
-            this.ANIMATION_COUNTER = 60;
-        else if(this.ANIMATION_COUNTER >= 50) {
-            this.update("/imagenes/null.png");
-            this.ANIMATION_COUNTER++;
+        if(ANIMATION_COUNTER > 60)
+            ANIMATION_COUNTER = 60;
+        else if(ANIMATION_COUNTER >= 50) {
+            update("/imagenes/null.png");
+            ANIMATION_COUNTER++;
         }
         else {
             for (int i = 10; i <= 40; i += 10) {
-                if(i-10 <= this.ANIMATION_COUNTER && this.ANIMATION_COUNTER < i)
-                    this.update("/imagenes/explosiones/" + dir + "/" + dir + "_exp-" + (50-i)/10 + ".png");
+                if(i-10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i)
+                    update("/imagenes/explosiones/" + dir + "/" + dir + "_exp-" + (50-i)/10 + ".png");
             }
 
-            this.ANIMATION_COUNTER++;
+            ANIMATION_COUNTER++;
         }
     }
 

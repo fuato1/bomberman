@@ -24,9 +24,7 @@ public class SettingsController {
             HashMap<Object, Object> config = (HashMap<Object, Object>) parser.parse(reader);
 
             // seteando controles desde properties.json
-            setFullSreenState((boolean) config.get("fullScreen"));
             setSoundState((boolean) config.get("sound"));
-            setSoundTrack((String) config.get("soundTrack"));
 
             // seteando teclas desde properties.json
             JSONObject keys = (JSONObject) config.get("keys");
@@ -49,9 +47,7 @@ public class SettingsController {
             HashMap<Object, Object> config = (HashMap<Object, Object>) parser.parse(reader);
 
             // seteando controles desde properties.json
-            config.put("fullScreen", model.isFullScreen());
             config.put("sound", model.isSound());
-            config.put("soundTrack", model.getSoundTrack());
 
             // seteando teclas desde properties.json
             JSONObject keys = (JSONObject) config.get("keys");
@@ -89,16 +85,8 @@ public class SettingsController {
     /*
         Getters  
     */
-    public static boolean getFullScreenState() {
-        return model.isFullScreen();
-    }
-
     public static boolean getSoundState() {
         return model.isSound();
-    }
-
-    public static String getSoundTrack() {
-        return model.getSoundTrack();
     }
 
     public static HashMap<String, String> getDefaultKeys() {
@@ -112,16 +100,8 @@ public class SettingsController {
     /*
         Setters 
     */
-    public static void setFullSreenState(boolean state) {
-        model.setFullScreen(state);
-    }
-
     public static void setSoundState(boolean state) {
         model.setSound(state);
-    }
-
-    public static void setSoundTrack(String soundTrack) {
-        model.setSoundTrack(soundTrack);
     }
 
     /*

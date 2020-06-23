@@ -3,19 +3,15 @@ package model.properties.model;
 import java.util.HashMap;
 
 public class Settings {
-    private boolean fullScreen;
     private boolean sound;
     private HashMap<String, String> defaultKeys, customKeys;
-    private String soundTrack;
 
     private static Settings settings;
 
-    private Settings(boolean fullScreen, boolean sound, HashMap<String, String> defaultKeys, HashMap<String, String> customKeys, String soundTrack) {
-        this.fullScreen = fullScreen;
+    private Settings(boolean sound, HashMap<String, String> defaultKeys, HashMap<String, String> customKeys) {
         this.sound = sound;
         this.defaultKeys = defaultKeys;
         this.customKeys = customKeys;
-        this.soundTrack = soundTrack;
     }
 
     public static Settings getSettings() {
@@ -23,26 +19,19 @@ public class Settings {
             HashMap<String, String> defaultKeys = new HashMap<String, String>(7);
             HashMap<String, String> customKeys = new HashMap<String, String>(7);
 
-            defaultKeys.put("Sonido", "q");
-            defaultKeys.put("Música", "w");
-            defaultKeys.put("Pausa", "p");
-            defaultKeys.put("Ayuda", "h");
-            defaultKeys.put("Izquierda", "left arrow");
-            defaultKeys.put("Derecha", "right arrow");
-            defaultKeys.put("Acción", "space");
+            defaultKeys.put("Sonido", "83");
+            defaultKeys.put("Pausa", "80");
+            defaultKeys.put("Arriba", "38");
+            defaultKeys.put("Abajo", "40");
+            defaultKeys.put("Izquierda", "37");
+            defaultKeys.put("Derecha", "39");
+            defaultKeys.put("Acción", "32");
+            defaultKeys.put("Detonador", "68");
 
-            settings = new Settings(false, true, defaultKeys, customKeys, "original");
+            settings = new Settings(true, defaultKeys, customKeys);
         }
 
         return settings;
-    }
-
-    public boolean isFullScreen() {
-        return fullScreen;
-    }
-
-    public void setFullScreen(boolean fullScreen) {
-        this.fullScreen = fullScreen;
     }
 
     public boolean isSound() {
@@ -51,14 +40,6 @@ public class Settings {
 
     public void setSound(boolean sound) {
         this.sound = sound;
-    }
-
-    public String getSoundTrack() {
-        return soundTrack;
-    }
-
-    public void setSoundTrack(String soundTrack) {
-        this.soundTrack = soundTrack;
     }
 
     public static void setSettings(Settings settings) {
@@ -83,7 +64,7 @@ public class Settings {
 
     @Override
     public String toString() {
-        return "Settings [customKeys=" + customKeys + ", defaultKeys=" + defaultKeys + ", fullScreen=" + fullScreen
-                + ", sound=" + sound + ", soundTrack=" + soundTrack + "]";
+        return "Settings [customKeys=" + customKeys + ", defaultKeys=" + defaultKeys +
+            ", sound=" + sound + "]";
     }
 }
