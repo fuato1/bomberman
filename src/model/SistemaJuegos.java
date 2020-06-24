@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,13 +18,13 @@ import model.jugador.Jugador;
 public class SistemaJuegos extends JPanel implements ActionListener {
     private static final long serialVersionUID = 1L;
 
-    private Jugador player;
+    public static Jugador player;
     JGame game;
     Thread t;
     JButton bBomberman, bProx;
 
-    public SistemaJuegos(Jugador player) {
-        this.player = player;
+    public SistemaJuegos() {
+        player = new Jugador("Player");
 
         int rows = 0;
     	int columns = 1;

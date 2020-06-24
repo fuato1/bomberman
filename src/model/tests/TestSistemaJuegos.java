@@ -1,12 +1,13 @@
 package model.tests;
 
 import model.SistemaJuegos;
-import model.jugador.Jugador;
+import model.properties.controller.SettingsController;
 
 public class TestSistemaJuegos {
     public static void main(String[] args) {
-        Jugador player = new Jugador("Player");
-        SistemaJuegos sj = new SistemaJuegos(player);
+        SettingsController.initView();
+
+        SistemaJuegos sj = new SistemaJuegos();
         sj.launch();
     }
 }

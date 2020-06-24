@@ -17,6 +17,7 @@ import model.ObjetoGrafico;
 import model.Puntaje;
 import model.Ranking;
 import model.Reloj;
+import model.SistemaJuegos;
 import model.Vidas;
 import model.bonus.Puerta;
 import model.bonus.strategy.Bonus;
@@ -33,9 +34,10 @@ import model.jugador.Jugador;
 import model.pared.Pared;
 import model.pared.ParedLadrillo;
 import model.properties.controller.SettingsController;
+import model.properties.view.views_listeners.ScreenStateListener;
 import model.tests.ConsoleColors;
 
-public class Bomberman extends JGame {
+public class Bomberman extends JGame implements ScreenStateListener {
     /*
      * objetos graficos del juego
      */
@@ -54,7 +56,6 @@ public class Bomberman extends JGame {
     private Puntaje points;
     private Vidas life;
     private Jugador player;
-    private HashMap<String, Integer> playerKeys;
 
     /*
      * objetos graficos y clases secundarias
@@ -97,6 +98,13 @@ public class Bomberman extends JGame {
     private boolean PLAY = false;
     private boolean IS_MAIN_SCREEN = true;
     private boolean END_GAME = false;
+
+    /*
+     * variables de estado de la configuracion y teclas configuradas por el jugador
+     */
+    private boolean FULL_SCREEN;
+    private boolean SOUND;
+    private HashMap<String, Integer> playerKeys;
 
     /*
      * variables de cambio y estado de nivel
@@ -305,11 +313,7 @@ public class Bomberman extends JGame {
                         int row = (int) pe.getY() / 32 - 2;
                         int col = (int) pe.getX() / 32;
 
-                        if(
-                            mapPositions[row][col] == 1 || 
-                            mapPositions[row][col] == 4 ||
-                            mapPositions[row][col] == 5) 
-                        {
+                        if (mapPositions[row][col] == 1 || mapPositions[row][col] == 4 || mapPositions[row][col] == 5) {
                             break;
                         }
 
@@ -375,8 +379,8 @@ public class Bomberman extends JGame {
         Keyboard keyboard = this.getKeyboard();
 
         /*
-        * tecla para mostrar el mapa por consola (solo para test)
-        */
+         * tecla para mostrar el mapa por consola (solo para test)
+         */
         for (KeyEvent e : keyboard.getEvents()) {
             if (e.getID() == KeyEvent.KEY_PRESSED) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -385,21 +389,21 @@ public class Bomberman extends JGame {
                 if (e.getKeyCode() == playerKeys.get("Acción")) {
                     if (mapPositions[(int) hero.getY() / 32 - 2][(int) hero.getX() / 32] != 1) {
                         /*
-                            * el heroe instancia y setea la bomba en su posicion actual para colocarla
-                            */
+                         * el heroe instancia y setea la bomba en su posicion actual para colocarla
+                         */
                         Bomba b = hero.setBomb();
 
                         /*
-                            * si el objeto Bomba no es nulo
-                            */
+                         * si el objeto Bomba no es nulo
+                         */
                         if (b != null) {
                             /*
-                                * y no hay una bomba activa
-                                */
+                             * y no hay una bomba activa
+                             */
                             if (!Bomba.isActive()) {
                                 /*
-                                    * se da permiso a una nueva bomba para ser colocada y se la agrega al mapa
-                                    */
+                                 * se da permiso a una nueva bomba para ser colocada y se la agrega al mapa
+                                 */
                                 Bomba.setActive(true);
                                 bombs.add(b);
                             }
@@ -447,28 +451,37 @@ public class Bomberman extends JGame {
                 for (int j = 1; j < 25; j++) { // columnas
                     if (i % 2 == 0) { // fila con paredes de piedra
                         if (j % 2 != 0) { // si no hay una pared de piedra central
-                            if (mapPositions[i][j] != 4 && mapPositions[i][j] != 5) { // si no hay paredes de piedra
-                                if (mapPositions[i][j] == 3) { // si es la posicion del heroe
-                                    mapPositions[i][j] = 0;
-                                } else if (mapPositions[i][j] == 2) { // si es la posicion de un enemigo
-                                    mapPositions[i][j] = 0;
-                                } else if (mapPositions[i][j] == 6) {
-                                    mapPositions[i][j] = 0;
-                                }
-                            }
+                            mapPositions[i][j] = 0;
+                            // if (mapPositions[i][j] == 3) { // si es la posicion del heroe
+                            // mapPositions[i][j] = 0;
+                            // }
+                            // else if (mapPositions[i][j] == 2) { // si es la posicion de un enemigo
+                            // mapPositions[i][j] = 0;
+                            // }
+                            // else if(mapPositions[i][j] == 4) {
+
+                            // }
+                            // else if(mapPositions[i][j] == 4) {
+
+                            // }
+                            // else if (mapPositions[i][j] == 6) {
+                            // mapPositions[i][j] = 0;
+                            // }
                         } else { // restaurando posibles seteos en 0 por los objetos movibles
                             mapPositions[i][j] = 1;
                         }
                     } else { // fila sin paredes de piedra
-                        if (mapPositions[i][j] != 4 && mapPositions[i][j] != 5) { // si no hay paredes de ladrillo
-                            if (mapPositions[i][j] == 3) { // si es la posicion del heroe
-                                mapPositions[i][j] = 0;
-                            } else if (mapPositions[i][j] == 2) { // si es la posicion de un enemigo
-                                mapPositions[i][j] = 0;
-                            } else if (mapPositions[i][j] == 6) {
-                                mapPositions[i][j] = 0;
-                            }
-                        }
+                        mapPositions[i][j] = 0;
+                        // if (mapPositions[i][j] != 4 && mapPositions[i][j] != 5) { // si no hay
+                        // paredes de ladrillo
+                        // if (mapPositions[i][j] == 3) { // si es la posicion del heroe
+                        // mapPositions[i][j] = 0;
+                        // } else if (mapPositions[i][j] == 2) { // si es la posicion de un enemigo
+                        // mapPositions[i][j] = 0;
+                        // } else if (mapPositions[i][j] == 6) {
+                        // mapPositions[i][j] = 0;
+                        // }
+                        // }
                     }
                 }
             }
@@ -501,6 +514,41 @@ public class Bomberman extends JGame {
                 }
             }
 
+            for (int i = 0; i < brickWalls.size(); i++) {
+                if (brickWalls.get(i).wasHit()) {
+                    brickWalls.get(i).changeObject();
+                } else if (brickWalls.get(i).wasDestroyed()) {
+                    row = (int) ((brickWalls.get(i).getY() + 16) / 32 - 2);
+                    col = (int) ((brickWalls.get(i).getX() + 16) / 32);
+                    mapPositions[row][col] = 0;
+
+                    brickWalls.remove(i);
+                    System.out.println("Se elimino");
+                    System.out.println("Quedan: " + brickWalls.size());
+                } else {
+                    setOnMap(brickWalls.get(i));
+                }
+            }
+
+            for (Bonus b : bonus) {
+                row = (int) ((b.getY() + 16) / 32 - 2);
+                col = (int) ((b.getX() + 16) / 32);
+                mapPositions[row][col] = BONUS;
+
+                if (mapPositions[row - 1][col] == 3 || mapPositions[row + 1][col] == 3
+                        || mapPositions[row][col - 1] == 3 || mapPositions[row][col + 1] == 3) {
+                    if (b.getClass() == Puerta.class && enemies.isEmpty()) {
+                        PLAY = false;
+                        CURRENT_STAGE++;
+                        CHANGE_STATE_COUNTER = 170;
+                        IS_CHANGE_STAGE = true;
+                        END_GAME = true;
+                    } else {
+                        b.activateBonus();
+                    }
+                }
+            }
+
             /*
              * se setea en el mapa la posicion actual del heroe con un 3 (habiendo borrado
              * anteriormente la ultima posicion en la que se encontraba)
@@ -522,10 +570,9 @@ public class Bomberman extends JGame {
                      * cambio de sprites segun la direccion que toma el enemigo (el enemigo toma
                      * direcciones de forma aleatoria)
                      */
-                    if(e.wasHit()) {
+                    if (e.wasHit()) {
                         e.kill();
-                    }
-                    else {
+                    } else {
                         e.changeObject(e.getCurrentDirection());
                     }
 
@@ -623,8 +670,7 @@ public class Bomberman extends JGame {
                             hero.stop();
                         }
                     }
-                }
-                else {
+                } else {
                     enemies.remove(i);
                 }
             }
@@ -714,12 +760,12 @@ public class Bomberman extends JGame {
                             }
                         }
                     }
-                    if (mapPositions[row][col] == 1 || mapPositions[row][col] == 4
-                            || mapPositions[row][col] == 5) {
+                    if (mapPositions[row][col] == 1 || mapPositions[row][col] == 4 || mapPositions[row][col] == 5) {
                         if (mapPositions[row][col] == 4 || mapPositions[row][col] == 5) {
                             for (Pared bw : brickWalls) {
                                 if (isInside(e, bw)) {
                                     bw.hit();
+                                    System.out.println("Se golpeo");
                                     break;
                                 }
                             }
@@ -742,7 +788,7 @@ public class Bomberman extends JGame {
                             if (mapPositions[row][col] == 2) {
                                 for (int k = 0; k < enemies.size(); k++) {
                                     if (isInside(pe, enemies.get(k)) && !enemies.get(k).wasHit()) {
-                                        enemies.get(k).stop();        
+                                        enemies.get(k).stop();
                                     }
                                 }
                             }
@@ -761,8 +807,7 @@ public class Bomberman extends JGame {
                             }
                         }
                     }
-                }
-                else {
+                } else {
                     explosions.remove(i);
                 }
             }
@@ -792,49 +837,16 @@ public class Bomberman extends JGame {
         }
 
         /*
-        * se checkea que na haya mas bombas de las que el heroe puede usar (sin bonus)
-        */
-        if(bombs.size() <= 2 && !Bomba.isActive()) {
+         * se checkea que na haya mas bombas de las que el heroe puede usar (sin bonus)
+         */
+        if (bombs.size() <= 2 && !Bomba.isActive()) {
             /*
-                * se checkea que haya bombas y explosiones para ir quitando del mapa y que no
-                * haya ninguna explosion activa (solo se puede explotar una bomba y luego
-                * colocar otra cuando la anterior se desvanecio)
-                */
-            if(!bombs.isEmpty()) {
+             * se checkea que haya bombas y explosiones para ir quitando del mapa y que no
+             * haya ninguna explosion activa (solo se puede explotar una bomba y luego
+             * colocar otra cuando la anterior se desvanecio)
+             */
+            if (!bombs.isEmpty()) {
                 bombs.remove(0);
-            }
-        }
-
-        for (int i = 0; i < brickWalls.size(); i++) {
-            if (brickWalls.get(i).wasHit()) {
-                brickWalls.get(i).changeObject();
-            }
-            if(brickWalls.get(i).wasDestroyed()) {
-                row = (int) ((brickWalls.get(i).getY() + 16) / 32 - 2);
-                col = (int) ((brickWalls.get(i).getX() + 16) / 32);
-                mapPositions[row][col] = 0;
-
-                brickWalls.remove(i);
-            }
-        }
-
-        for (Bonus b : bonus) {
-            row = (int) ((b.getY() + 16) / 32 - 2);
-            col = (int) ((b.getX() + 16) / 32);
-            mapPositions[row][col] = BONUS;
-
-            if (mapPositions[row - 1][col] == 3 || mapPositions[row + 1][col] == 3
-                    || mapPositions[row][col - 1] == 3 || mapPositions[row][col + 1] == 3) {
-                if(b.getClass() == Puerta.class && enemies.isEmpty()) {
-                    PLAY = false;
-                    CURRENT_STAGE++;
-                    CHANGE_STATE_COUNTER = 170;
-                    IS_CHANGE_STAGE = true;
-                    END_GAME = true;
-                }
-                else {
-                    b.activateBonus();
-                }
             }
         }
     }
@@ -857,22 +869,16 @@ public class Bomberman extends JGame {
     }
 
     /*
-        metodo para checkear si o2 esta dentro de o1
-    */
+     * metodo para checkear si o2 esta dentro de o1
+     */
     private boolean isInside(ObjetoGrafico o1, ObjetoGrafico o2) {
-        boolean INSIDE_LEFT_RIGHT = 
-            (
-                o1.getX() <= o2.getX() && o2.getX() <= o1.getX() + 30 || 
-                o1.getX() <= o2.getX() + 28 && o2.getX() + 28 <= o1.getX() + 30
-            ) && 
-                o1.getY() <= o2.getY() + 16 && o2.getY() + 16 <= o1.getY() + 30;
+        boolean INSIDE_LEFT_RIGHT = (o1.getX() <= o2.getX() && o2.getX() <= o1.getX() + 30
+                || o1.getX() <= o2.getX() + 28 && o2.getX() + 28 <= o1.getX() + 30) && o1.getY() <= o2.getY() + 16
+                && o2.getY() + 16 <= o1.getY() + 30;
 
-        boolean INSIDE_UP_DOWN = 
-        (
-            o1.getY() <= o2.getY() + 28 && o2.getY() + 28 <= o1.getY() + 30 || 
-            o1.getY() <= o2.getY() && o2.getY() <= o1.getY() + 30
-        ) && 
-            o1.getX() <= o2.getX() + 16 && o2.getX() + 16 <= o1.getX() + 30;
+        boolean INSIDE_UP_DOWN = (o1.getY() <= o2.getY() + 28 && o2.getY() + 28 <= o1.getY() + 30
+                || o1.getY() <= o2.getY() && o2.getY() <= o1.getY() + 30) && o1.getX() <= o2.getX() + 16
+                && o2.getX() + 16 <= o1.getX() + 30;
 
         return INSIDE_LEFT_RIGHT || INSIDE_UP_DOWN;
     }
@@ -895,6 +901,8 @@ public class Bomberman extends JGame {
 
     @Override
     public void gameStartup() {
+        readPropertiesFile();
+
         if (!PLAY) {
             /*
              * se inicia la camara y su region visible, el fondo de comienzo como pantalla
@@ -926,7 +934,6 @@ public class Bomberman extends JGame {
             clock = new Reloj();
             points = new Puntaje();
             life = new Vidas();
-            player = new Jugador();
 
             /*
              * instanciando a los enemigos, paredes de piedra, paredes de ladrillo y bonus
@@ -1001,7 +1008,8 @@ public class Bomberman extends JGame {
                 boolean NULL_WALL_POS2 = row == 1 && col == 2;
                 boolean NULL_WALL_POS3 = row == 2 && col == 1;
 
-                while (mapPositions[row][col] == 1 || NULL_WALL_POS1 || NULL_WALL_POS2 || NULL_WALL_POS3) {
+                while (mapPositions[row][col] == 1 || mapPositions[row][col] == 4 || NULL_WALL_POS1 || NULL_WALL_POS2
+                        || NULL_WALL_POS3) {
                     x = LEFT_WALL_LIMIT + 32 * (2 * (r.nextInt(11)));
                     y = UPPER_WALL_LIMIT + 32 * (2 * (r.nextInt(5)));
 
@@ -1072,16 +1080,37 @@ public class Bomberman extends JGame {
 
     @Override
     public void gameShutdown() {
-        System.out.println("close");
+
     }
 
     @Override
     protected void readPropertiesFile() {
         SettingsController.readSettings();
-        playerKeys = new HashMap<String, Integer>(SettingsController.getCustomKeys().size());
+
+        player = SistemaJuegos.player;
+        player.setNickName(SettingsController.getPlayerName()); // nombre del jugador
+
+        FULL_SCREEN = SettingsController.getFullScreenState(); // estado de la pantalla completa
+        SOUND = SettingsController.getSoundState(); // estado del sonido
+
+        playerKeys = new HashMap<String, Integer>(SettingsController.getCustomKeys().size()); // teclas del juego
 
         for (String key : SettingsController.getCustomKeys().keySet()) {
             playerKeys.put(key, Integer.parseInt(SettingsController.getCustomKeys().get(key)));
         }
+    }
+
+    @Override
+    public void stateChanged(boolean newState) {
+        /*
+         * necesito acceso al JFrame!
+         */
+        // if(newState) {
+        // mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        // }
+        // else {
+        // mainFrame.setSize(500, 400);
+        // mainFrame.setLocationRelativeTo(null);
+        // }
     }
 }

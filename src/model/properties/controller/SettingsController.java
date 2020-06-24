@@ -24,6 +24,8 @@ public class SettingsController {
             HashMap<Object, Object> config = (HashMap<Object, Object>) parser.parse(reader);
 
             // seteando controles desde properties.json
+            setPlayerName((String) config.get("playerName"));
+            setFullScreenState((boolean) config.get("fullScreen"));
             setSoundState((boolean) config.get("sound"));
 
             // seteando teclas desde properties.json
@@ -47,6 +49,8 @@ public class SettingsController {
             HashMap<Object, Object> config = (HashMap<Object, Object>) parser.parse(reader);
 
             // seteando controles desde properties.json
+            config.put("playerName", model.getPlayerName());
+            config.put("fullScreen", model.isFullScreen());
             config.put("sound", model.isSound());
 
             // seteando teclas desde properties.json
@@ -85,6 +89,14 @@ public class SettingsController {
     /*
         Getters  
     */
+    public static String getPlayerName() {
+        return model.getPlayerName();
+    }
+
+    public static boolean getFullScreenState() {
+        return model.isFullScreen();
+    }
+
     public static boolean getSoundState() {
         return model.isSound();
     }
@@ -100,6 +112,14 @@ public class SettingsController {
     /*
         Setters 
     */
+    public static void setPlayerName(String playerName) {
+        model.setPlayerName(playerName);
+    }
+
+    public static void setFullScreenState(boolean state) {
+        model.setFullScreen(state);
+    }
+
     public static void setSoundState(boolean state) {
         model.setSound(state);
     }

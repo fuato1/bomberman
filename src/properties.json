@@ -1,1 +1,1 @@
-{"keys":{"Sonido":"83","Arriba":"38","Abajo":"40","Detonador":"68","Pausa":"80","Izquierda":"37","Derecha":"39","Acción":"32"},"sound":true}
+{"playerName":"Player","keys":{"Sonido":"83","Arriba":"38","Abajo":"40","Detonador":"68","Pausa":"80","Izquierda":"37","Derecha":"39","Acción":"32"},"sound":true,"fullScreen":false}

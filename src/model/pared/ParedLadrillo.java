@@ -12,10 +12,11 @@ public class ParedLadrillo extends Pared {
     public void changeObject() {
         if(ANIMATION_COUNTER > 70) {
             ANIMATION_COUNTER = 70;
-            this.WAS_DESTROYED = true;
+            WAS_HIT = false;
+            WAS_DESTROYED = true;
         }
         else if(ANIMATION_COUNTER > 60) {
-            this.update("/imagenes/null.png");
+            update("/imagenes/null.png");
             ANIMATION_COUNTER++;
         }
         else {
@@ -34,6 +35,6 @@ public class ParedLadrillo extends Pared {
 
     @Override
     public void hit() {
-        this.WAS_HIT = true;
+        WAS_HIT = true;
     }
 }

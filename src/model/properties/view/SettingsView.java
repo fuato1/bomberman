@@ -7,8 +7,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import model.properties.controller.SettingsController;
+import model.properties.view.views_listeners.ScreenStateListener;
 
-public class SettingsView extends JPanel {
+public class SettingsView extends JPanel implements ScreenStateListener {
     private static final long serialVersionUID = 1L;
 
     // instancia de la interfaz
@@ -26,6 +27,7 @@ public class SettingsView extends JPanel {
         SettingsController.readSettings();
 
         optionsPanel = new OptionsPanel(new GridBagLayout());
+        optionsPanel.addScreenStateListener(this);
 
         buttonsPanel = new ButtonsPanel(new GridBagLayout());
         buttonsPanel.addButtonListener(optionsPanel);
@@ -52,7 +54,7 @@ public class SettingsView extends JPanel {
         this.add(buttonsPanel, gbc);
 
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setSize(400, 300);
+        mainFrame.setSize(500, 400);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setResizable(false);
         mainFrame.add(this);
@@ -64,7 +66,7 @@ public class SettingsView extends JPanel {
             mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
         else {
-            mainFrame.setSize(400, 300);
+            mainFrame.setSize(500, 400);
             mainFrame.setLocationRelativeTo(null);
         }
     }
