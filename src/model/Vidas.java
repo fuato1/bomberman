@@ -9,7 +9,7 @@ public class Vidas {
     private double x;
 
     public Vidas() {
-        x = 300;
+        x = 9*32;
     }
 
     /*

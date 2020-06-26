@@ -1,22 +1,32 @@
 package model;
 
+import java.util.Vector;
+
 import model.bomberman.Bomberman;
 import model.bomberman.Mundo;
+import model.bonus.strategy.Bonus;
 import model.factory.OGAbstractFactory;
 import model.factory.OGFactoryProducer;
 import model.interfaces.ObjetoCambianteMovible;
 
 public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     private int life;
-    private final double HERO_DISPLACEMENT = 100.0;
+    private double HERO_DISPLACEMENT = 100.0;
+    private Vector<Bonus> bonus;
 
     private boolean IS_OVER_WALL = false;
     private boolean IS_NEXT_TO_WALL = false;
     private boolean IS_DEAD = false;
+    
+    private int MAX_BOMBS = 1;
+    private boolean HAS_DETONATOR = false;
+    private boolean CAN_JUMP_BOMBS = false;
+    private int EXPLOSION_RANGE = 1;
 
     public Heroe() {
         super("/imagenes/bomberman/down/b_down-1.png");
         this.life = 3;
+        this.bonus = new Vector<Bonus>(0);
     }
 
     /*
@@ -24,6 +34,26 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     */
     public int getLife() {
         return life;
+    }
+
+    public int getMaxBombs() {
+        return MAX_BOMBS;
+    }
+
+    public boolean hasDetonator() {
+        return HAS_DETONATOR;
+    }
+
+    public double getHeroDisplacement() {
+        return HERO_DISPLACEMENT;
+    }
+
+    public boolean canJumpBombs() {
+        return CAN_JUMP_BOMBS;
+    }
+
+    public int getExplosionRange() {
+        return EXPLOSION_RANGE;
     }
 
     public boolean isOverWall() {
@@ -38,6 +68,10 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
         return IS_DEAD;
     }
 
+    public Vector<Bonus> getBonus() {
+        return bonus;
+    }
+
     /*
         Setters
     */
@@ -45,9 +79,43 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
         this.life = life;
     }
 
+    public void setMaxBombs(int MAX_BOMBS) {
+        this.MAX_BOMBS = MAX_BOMBS;
+    }
+
+    public void setHasDetonator(boolean HAS_DETONATOR) {
+        this.HAS_DETONATOR = HAS_DETONATOR;
+    }
+
+    public void setHeroDisplacement(double HERO_DISPLACEMENT) {
+        this.HERO_DISPLACEMENT = HERO_DISPLACEMENT;
+    }
+
+    public void setCanJumpBombs(boolean CAN_JUMP_BOMBS) {
+        this.CAN_JUMP_BOMBS = CAN_JUMP_BOMBS;
+    }
+
+    public void setExplosionRange(int EXPLOSION_RANGE) {
+        this.EXPLOSION_RANGE = EXPLOSION_RANGE;
+    }
+
+    public void consumeBonus(Bonus b) {
+        if(!(b == null)) {
+            bonus.add(b);
+            b.activateBonus(this);
+        }
+    }
+
+    private void deactivateBonus() {
+        for (Bonus b : bonus) {
+            b.deactivateBonus(this);
+        }
+        bonus.removeAllElements();
+    }
+
     public Bomba setBomb() {
-        checkHorizontalMovement();
-        checkHorizontalMovement();
+        checkHorizontalMovement(); // arreglar
+        checkHorizontalMovement(); // arreglar
 
         OGAbstractFactory factory = OGFactoryProducer.getFactory();
         Bomba b = factory.getBomba();
@@ -137,7 +205,7 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     */
     private void checkVerticalMovement() {
         for (int i = 0; i < 11; i++) {
-            if((64 + 64*i)+1 < getX() + 28 && getX() < (96 + 64*i)-1) {
+            if((64 + 64*i)+1 < getX() + 30 && getX() < (96 + 64*i)-1) {
                 IS_OVER_WALL = true;
             }
         }
@@ -145,7 +213,7 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
 
     private void checkHorizontalMovement() {
         for (int i = 0; i < 5; i++) {
-            if((137 + 64*i)+1 < getY() + 28 && getY() < (169 + 64*i)-1) {
+            if((137 + 64*i)+1 < getY() + 30 && getY() < (169 + 64*i)-1) {
                 IS_NEXT_TO_WALL = true;
             }
         }
@@ -157,6 +225,7 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     public void stop() {
         IS_DEAD = true;
         life--;
+        deactivateBonus();
     }
 
     public void up(double delta) {

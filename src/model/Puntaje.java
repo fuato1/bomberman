@@ -8,10 +8,9 @@ import model.bomberman.Bomberman;
 public class Puntaje {
     private int currentScore = 0;
     private double x;
-    private double ANIMATION_COUNTER = 0;
 
     public Puntaje() {
-        x = 500;
+        x = 17*32;
     }
 
     /*
@@ -34,16 +33,6 @@ public class Puntaje {
 
     public void setX(double x) {
         this.x = x;
-    }
-
-    public void countScore() {
-        if(ANIMATION_COUNTER > 100)
-            ANIMATION_COUNTER = 0;
-        else
-            ANIMATION_COUNTER++;
-
-        if(ANIMATION_COUNTER == 100)
-            currentScore++;
     }
 
     public void draw(Graphics2D g) {

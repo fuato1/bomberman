@@ -7,8 +7,6 @@ import model.interfaces.ObjetoCambianteEstatico;
 
 public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
     private int time = 3;
-    private int range = 2;
-    private static boolean IS_ACTIVE = false;
 
     public Bomba() {
         super("/imagenes/bombas/bomb-1.png");
@@ -21,20 +19,12 @@ public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
         return this.time;
     }
 
-    public int getRange() {
-        return this.range;
-    }
-
-    public static boolean isActive() {
-        return IS_ACTIVE;
-    }
-
     /*
         detonacion de la bomba
     */
-    public Explosion detonate() {
+    public Explosion detonate(int range) {
         OGAbstractFactory factory = OGFactoryProducer.getFactory();
-        Explosion e = factory.getExplosion();
+        Explosion e = factory.getExplosion(range);
         e.setPosition(this.getX(), this.getY());
         setPosition(0, 0);
 
@@ -46,14 +36,6 @@ public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
     */
     public void setTime(int time) {
         this.time = time;
-    }
-
-    public void setRange(int range) {
-        this.range = range;
-    }
-
-    public static void setActive(boolean IS_ACTIVE) {
-        Bomba.IS_ACTIVE = IS_ACTIVE;
     }
 
     /*

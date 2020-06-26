@@ -30,9 +30,8 @@ public interface OGAbstractFactory {
     /*
         metodos de la fabrica para Explosion
     */
-    public Explosion getExplosion();
-    public Vector<ParteExplosion> getTipExplosion(int id);
-    public Vector<ParteExplosion> getMidExplosions(int id, int n);
+    public Explosion getExplosion(int range);
+    public Vector<ParteExplosion> getExplosionBranch(int id, int range);
     
     /*
         metodos de la fabrica para Enemigo

@@ -12,6 +12,10 @@ public class EnemigoAzul extends Enemigo {
     */
     @Override
     public void changeObject(String dir) {
+        if(IMMUNITY > 0) {
+            IMMUNITY--;
+        }
+
         if(ENEMY_MOVING_TIME < 0) {
             Random r = new Random(System.currentTimeMillis());
             CURRENT_DIRECTION = directions[r.nextInt(15)%4];
@@ -37,11 +41,27 @@ public class EnemigoAzul extends Enemigo {
 
     @Override
     public void kill() {
-        if(ANIMATION_COUNTER > 70)
+        if(ANIMATION_COUNTER > 70) {
             ANIMATION_COUNTER = 70;
-        if(ANIMATION_COUNTER >= 35)
+            IS_DEAD = true;
+        }
+        else if(ANIMATION_COUNTER >= 60) {
             update("/imagenes/null.png");
-        if(ANIMATION_COUNTER < 35)
-            update("/imagenes/enemigos/azul/enemigo_azul_M1.png");
+            ANIMATION_COUNTER++;
+        }
+        else {
+            for (int i = 10; i <= 50; i += 10) {
+                if(i-10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i)
+                    if(i/10 == 1){
+                        update("/imagenes/enemigos/azul/eliminado/enemigo_azul_M" + i/10 + ".png");
+
+                    }
+                    else{
+                        update("/imagenes/enemigos/rosa/eliminado/enemigo_rosa_M" + i/10 + ".png");
+                    }
+            }
+
+            ANIMATION_COUNTER++;
+        }
     }
 }

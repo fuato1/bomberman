@@ -104,12 +104,10 @@ public class OptionsPanel extends JPanel implements ActionListener, ButtonListen
 
     private void changeScreenState() {
         if(fullScreenCB.isSelected()) {
-            System.out.println("cambiando a pantalla completa...");
             SettingsController.setFullScreenState(true);
             ssl.stateChanged(true);
         }
         else {
-            System.out.println("cambiando a ventana...");
             SettingsController.setFullScreenState(false);
             ssl.stateChanged(false);
         }
@@ -117,11 +115,9 @@ public class OptionsPanel extends JPanel implements ActionListener, ButtonListen
 
     private void changeSoundState() {
         if(soundCB.isSelected()) {
-            System.out.println("activando sonido...");
             SettingsController.setSoundState(true);
         }
         else {
-            System.out.println("desactivando sonido...");
             SettingsController.setSoundState(false);
         }
     }
@@ -129,7 +125,6 @@ public class OptionsPanel extends JPanel implements ActionListener, ButtonListen
     @Override
     public void saveButtonActioned() {
         SettingsController.setPlayerName(playerNameTF.getText());
-
         SettingsController.saveSettings();
     }
 

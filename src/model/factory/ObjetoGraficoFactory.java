@@ -63,50 +63,48 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
     }
 
     @Override
-    public Explosion getExplosion() {
-        return new Explosion("/imagenes/explosiones/center/center_exp-1.png");
+    public Explosion getExplosion(int range) {
+        return new Explosion("/imagenes/explosiones/center/center_exp-1.png", range);
     }
 
     @Override
-    public Vector<ParteExplosion> getTipExplosion(int id) {
-        Vector<ParteExplosion> tipExp = new Vector<ParteExplosion>(1);
+    public Vector<ParteExplosion> getExplosionBranch(int id, int range) {
+        Vector<ParteExplosion> expBranch = new Vector<ParteExplosion>(range);
 
         if (id == Explosion.EXPLOSION_UP) {
-            tipExp.add(new ParteExplosion("/imagenes/explosiones/up/up_exp-1.png", "up"));
-            return tipExp;
+            for (int i = 0; i < range-1; i++) {
+                expBranch.add(new ParteExplosion("/imagenes/explosiones/vertical/vertical_exp-1.png", "vertical"));
+            }
+
+            expBranch.add(new ParteExplosion("/imagenes/explosiones/up/up_exp-1.png", "up"));
+            return expBranch;
         }
         if (id == Explosion.EXPLOSION_DOWN) {
-            tipExp.add(new ParteExplosion("/imagenes/explosiones/down/down_exp-1.png", "down"));
-            return tipExp;
+            for (int i = 0; i < range-1; i++) {
+                expBranch.add(new ParteExplosion("/imagenes/explosiones/vertical/vertical_exp-1.png", "vertical"));
+            }
+
+            expBranch.add(new ParteExplosion("/imagenes/explosiones/down/down_exp-1.png", "down"));
+            return expBranch;
         }
         if (id == Explosion.EXPLOSION_LEFT) {
-            tipExp.add(new ParteExplosion("/imagenes/explosiones/left/left_exp-1.png", "left"));
-            return tipExp;
+            for (int i = 0; i < range-1; i++) {
+                expBranch.add(new ParteExplosion("/imagenes/explosiones/horizontal/horizontal_exp-1.png", "horizontal"));
+            }
+
+            expBranch.add(new ParteExplosion("/imagenes/explosiones/left/left_exp-1.png", "left"));
+            return expBranch;
         }
         if (id == Explosion.EXPLOSION_RIGHT) {
-            tipExp.add(new ParteExplosion("/imagenes/explosiones/right/right_exp-1.png", "right"));
-            return tipExp;
+            for (int i = 0; i < range-1; i++) {
+                expBranch.add(new ParteExplosion("/imagenes/explosiones/horizontal/horizontal_exp-1.png", "horizontal"));
+            }
+
+            expBranch.add(new ParteExplosion("/imagenes/explosiones/right/right_exp-1.png", "right"));
+            return expBranch;
         }
 
         return null;
-    }
-
-    @Override
-    public Vector<ParteExplosion> getMidExplosions(int id, int n) {
-        Vector<ParteExplosion> midExp = new Vector<ParteExplosion>(n);
-
-        if (id == Explosion.EXPLOSION_UP) {
-            for (int i = 0; i < n; i++) {
-                midExp.add(new ParteExplosion("/imagenes/explosiones/vertical/vertical_exp-1.png", "vertical"));
-            }
-        }
-        if (id == Explosion.EXPLOSION_LEFT) {
-            for (int i = 0; i < n; i++) {
-                midExp.add(new ParteExplosion("/imagenes/explosiones/horizontal/horizontal_exp-1.png", "horizontal"));
-            }
-        }
-
-        return midExp;
     }
 
     @Override

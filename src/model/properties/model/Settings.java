@@ -87,10 +87,4 @@ public class Settings {
     public void setCustomKeys(HashMap<String, String> customKeys) {
         this.customKeys = customKeys;
     }
-
-    @Override
-    public String toString() {
-        return "Settings [customKeys=" + customKeys + ", defaultKeys=" + defaultKeys +
-            ", sound=" + sound + "]";
-    }
 }

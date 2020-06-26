@@ -4,9 +4,13 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
+
+import javax.imageio.ImageIO;
 
 import com.entropyinteractive.JGame;
 import com.entropyinteractive.Keyboard;
@@ -34,10 +38,9 @@ import model.jugador.Jugador;
 import model.pared.Pared;
 import model.pared.ParedLadrillo;
 import model.properties.controller.SettingsController;
-import model.properties.view.views_listeners.ScreenStateListener;
 import model.tests.ConsoleColors;
 
-public class Bomberman extends JGame implements ScreenStateListener {
+public class Bomberman extends JGame {
     /*
      * objetos graficos del juego
      */
@@ -91,6 +94,7 @@ public class Bomberman extends JGame implements ScreenStateListener {
      */
     public static final int BORDER_WALLS = 73;
     public static final int INTERIOR_WALLS = 55;
+    public final int BRICK_WALLS = 30;
 
     /*
      * variable de estado para iniciar el juego
@@ -98,6 +102,7 @@ public class Bomberman extends JGame implements ScreenStateListener {
     private boolean PLAY = false;
     private boolean IS_MAIN_SCREEN = true;
     private boolean END_GAME = false;
+    private boolean PAUSE = false;
 
     /*
      * variables de estado de la configuracion y teclas configuradas por el jugador
@@ -199,7 +204,15 @@ public class Bomberman extends JGame implements ScreenStateListener {
                 }
             }
         } else {
-            gameScreenUpdate(delta);
+            for (KeyEvent e : keyboard.getEvents()) {
+                if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyCode() == playerKeys.get("Pausa")) {
+                    PAUSE = !PAUSE;
+                }
+            }
+
+            if (!PAUSE) {
+                gameScreenUpdate(delta);
+            }
         }
     }
 
@@ -224,20 +237,20 @@ public class Bomberman extends JGame implements ScreenStateListener {
         bg.setImage("/imagenes/black.png");
         bg.draw(g);
 
-        g.setColor(Color.black);
-        g.drawString("Ranking: ", 280, 50);
+        // g.setColor(Color.black);
+        // g.drawString("Ranking: ", 280, 50);
         g.setColor(Color.white);
         g.drawString("Ranking: ", 282, 50);
 
         if (END_GAME) {
-            g.setColor(Color.black);
-            g.drawString("Press 'R' to play again", 100, 460);
+            // g.setColor(Color.black);
+            // g.drawString("Press 'R' to play again", 100, 460);
             g.setColor(Color.white);
             g.drawString("Press 'R' to play again", 102, 460);
         }
 
-        g.setColor(Color.black);
-        g.drawString("Press 'Esc' to exit", 400, 460);
+        // g.setColor(Color.black);
+        // g.drawString("Press 'Esc' to exit", 400, 460);
         g.setColor(Color.white);
         g.drawString("Press 'Esc' to exit", 402, 460);
 
@@ -245,8 +258,9 @@ public class Bomberman extends JGame implements ScreenStateListener {
         for (int i = 0; i < ranking.getScores().size(); i++) {
             player = ranking.getScores().get(i);
 
-            g.setColor(Color.black);
-            g.drawString(player.getNickName() + ": " + player.getScore(), 280, 140 + 32 * (i));
+            // g.setColor(Color.black);
+            // g.drawString(player.getNickName() + ": " + player.getScore(), 280, 140 + 32 *
+            // (i));
 
             g.setColor(Color.white);
             g.drawString(player.getNickName() + ": " + player.getScore(), 282, 140 + 32 * (i));
@@ -257,8 +271,8 @@ public class Bomberman extends JGame implements ScreenStateListener {
         bg.setImage("/imagenes/black.png");
         bg.draw(g);
 
-        g.setColor(Color.black);
-        g.drawString("Stage " + CURRENT_STAGE, 300, 240);
+        // g.setColor(Color.black);
+        // g.drawString("Stage " + CURRENT_STAGE, 300, 240);
         g.setColor(Color.white);
         g.drawString("Stage " + CURRENT_STAGE, 302, 240);
 
@@ -291,6 +305,14 @@ public class Bomberman extends JGame implements ScreenStateListener {
 
         bg.draw(g);
         world.display(g);
+
+        try {
+            BufferedImage img = ImageIO.read(getClass().getResource("/imagenes/upper_panel.png"));
+            g.drawImage(img, 0, 0, null);
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+
         clock.draw(g);
         points.draw(g);
         hero.draw(g);
@@ -378,14 +400,23 @@ public class Bomberman extends JGame implements ScreenStateListener {
     private void gameScreenUpdate(double delta) {
         Keyboard keyboard = this.getKeyboard();
 
-        /*
-         * tecla para mostrar el mapa por consola (solo para test)
-         */
         for (KeyEvent e : keyboard.getEvents()) {
             if (e.getID() == KeyEvent.KEY_PRESSED) {
+                /*
+                 * enter durente el juego para mostrar el mapa (solo test)
+                 */
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     showMap();
                 }
+                /*
+                 * tecla definida por el jugador para uso del detonador
+                 */
+                if (e.getKeyCode() == playerKeys.get("Detonador")) {
+                    hero.setHasDetonator(false);
+                }
+                /*
+                 * tecla definida por el jugador en la configuracion para colocar bombas
+                 */
                 if (e.getKeyCode() == playerKeys.get("Acción")) {
                     if (mapPositions[(int) hero.getY() / 32 - 2][(int) hero.getX() / 32] != 1) {
                         /*
@@ -397,14 +428,7 @@ public class Bomberman extends JGame implements ScreenStateListener {
                          * si el objeto Bomba no es nulo
                          */
                         if (b != null) {
-                            /*
-                             * y no hay una bomba activa
-                             */
-                            if (!Bomba.isActive()) {
-                                /*
-                                 * se da permiso a una nueva bomba para ser colocada y se la agrega al mapa
-                                 */
-                                Bomba.setActive(true);
+                            if (bombs.size() < hero.getMaxBombs()) {
                                 bombs.add(b);
                             }
                         }
@@ -414,35 +438,36 @@ public class Bomberman extends JGame implements ScreenStateListener {
         }
 
         /*
-         * animaciones del reloj y contador de puntos del jugador
+         * animaciones del reloj
          */
         clock.countTime();
-        points.countScore();
+        if (clock.getTime() == 0) {
+            hero.stop();
+        }
 
         /*
          * controles de movimiento para el heroe y los enemigos
          * 
          * si el heroe no esta muerto los enemigos seguiran moviendose y el heroe igual
          * 
-         * caso contrario si el heroe todavia tiene vidas se le quitara una y se hace la
-         * animacion de muerte
+         * caso contrario, si el heroe todavia tiene vidas se le quitara una y se hace
+         * la animacion de muerte
          * 
          * si el heroe ya no tiene vidas se pasa a la pantalla de game over donde esta
          * el ranking.
+         * 
+         * las variables row y col se usan durante las iteraciones de los objetos
+         * graficos para ir calculando sus posiciones en el mapa y hacer controles
          */
         int row;
         int col;
 
         if (!hero.isDead()) {
             /*
-             * se itera sobre el mapa para setear las posiciones de el heroe y los enemigos
-             * en 0 y liberar los espacios por los que se van moviendo
+             * se itera sobre el mapa para setear las posiciones del heroe y los enemigos en
+             * 0 y liberar los espacios por los que se van moviendo
              * 
-             * adicionalmente se coloca un 1 en las paredes de piedra y 4 en las paredes de
-             * ladrillo ya que por problemas de calcula muchas veces los objetos que se
-             * mueven setean en 0 posiciones que no deberian.
-             * 
-             * otra razon es que haciendo el seteo en el mapa a 0 de las posiciones
+             * otra razon, es que haciendo el seteo en el mapa a 0 de las posiciones
              * anteriores de los objetos movibles en los controles de movimiento de los
              * mismos muchas veces deja valores 2 y 3 sobre el mapa invalidos que no son
              * quitados
@@ -452,153 +477,139 @@ public class Bomberman extends JGame implements ScreenStateListener {
                     if (i % 2 == 0) { // fila con paredes de piedra
                         if (j % 2 != 0) { // si no hay una pared de piedra central
                             mapPositions[i][j] = 0;
-                            // if (mapPositions[i][j] == 3) { // si es la posicion del heroe
-                            // mapPositions[i][j] = 0;
-                            // }
-                            // else if (mapPositions[i][j] == 2) { // si es la posicion de un enemigo
-                            // mapPositions[i][j] = 0;
-                            // }
-                            // else if(mapPositions[i][j] == 4) {
-
-                            // }
-                            // else if(mapPositions[i][j] == 4) {
-
-                            // }
-                            // else if (mapPositions[i][j] == 6) {
-                            // mapPositions[i][j] = 0;
-                            // }
                         } else { // restaurando posibles seteos en 0 por los objetos movibles
                             mapPositions[i][j] = 1;
                         }
                     } else { // fila sin paredes de piedra
                         mapPositions[i][j] = 0;
-                        // if (mapPositions[i][j] != 4 && mapPositions[i][j] != 5) { // si no hay
-                        // paredes de ladrillo
-                        // if (mapPositions[i][j] == 3) { // si es la posicion del heroe
-                        // mapPositions[i][j] = 0;
-                        // } else if (mapPositions[i][j] == 2) { // si es la posicion de un enemigo
-                        // mapPositions[i][j] = 0;
-                        // } else if (mapPositions[i][j] == 6) {
-                        // mapPositions[i][j] = 0;
-                        // }
-                        // }
                     }
                 }
             }
 
-            for (Bomba b : bombs) {
+            for (int i = 0; i < bombs.size(); i++) {
+                Bomba b = bombs.get(i);
+
                 /*
                  * si alguna bomba va a explotar
                  */
                 if (b.getTime() == 0) {
                     /*
-                     * y hay una explosion menos que cantidad de bombas en el mapa
+                     * la bomba detona (instancia una Explosion y la setea en su posicion), se
+                     * agrega la explosion al mapa y se da permiso para agregar una nueva bomba
                      */
-                    if (bombs.size() - 1 == explosions.size()) {
-                        /*
-                         * la bomba detona (instancia una Explosion y la setea en su posicion), se
-                         * agrega la explosion al mapa y se da permiso para agregar una nueva bomba
-                         */
-                        explosions.add(b.detonate());
-                        Bomba.setActive(false);
-                    }
+                    explosions.add(b.detonate(hero.getExplosionRange()));
+                    bombs.remove(i);
                 } else {
                     /*
                      * se hace la animacion de la bomba
                      */
-                    b.changeObject();
+                    if (!hero.hasDetonator()) {
+                        b.changeObject();
+                    }
 
-                    if (b.getTime() > 0) {
+                    /*
+                     * si el heroe tiene un bonus de saltar bombas la bomba no se setea en el mapa
+                     * para que el heroe pueda pasar por arriba
+                     */
+                    if (b.getTime() > 0 && !hero.canJumpBombs()) {
                         setOnMap(b);
                     }
                 }
             }
 
+            /*
+             * Se colocan los bonus en el mapa y, en caso de que todavia no esten
+             * descubiertos, el bucle siguiente (de las paredes de ladrillo) cambiara la
+             * posicion del mapa a 4. Cuando la pared haya sido destruida ya no hara ese
+             * cambio y la posicion quedara ocupara por el identificador del bonus (5).
+             */
+            for (int i = 0; i < bonus.size(); i++) {
+                Bonus b = bonus.get(i);
+
+                if (!b.wasHit()) {
+                    row = (int) ((b.getY() + 16) / 32 - 2);
+                    col = (int) ((b.getX() + 16) / 32);
+                    mapPositions[row][col] = BONUS;
+                } else if (b.getClass() != Puerta.class) {
+                    bonus.remove(i);
+                }
+            }
+
+            /*
+             * Si la pared de ladrillo fue golpeada por una explosion se hace la animacion
+             * de la pared destruyendose.
+             * 
+             * Si la pared de ladrillo ya fue destruida (el metodo changeObject() setea la
+             * variable WAS_DESTROYED a true cuando finaliza la animacion) se remueve la
+             * pared.
+             * 
+             * En cualquier otro caso se la posiciona en el mapa.
+             */
             for (int i = 0; i < brickWalls.size(); i++) {
                 if (brickWalls.get(i).wasHit()) {
                     brickWalls.get(i).changeObject();
                 } else if (brickWalls.get(i).wasDestroyed()) {
-                    row = (int) ((brickWalls.get(i).getY() + 16) / 32 - 2);
-                    col = (int) ((brickWalls.get(i).getX() + 16) / 32);
-                    mapPositions[row][col] = 0;
-
                     brickWalls.remove(i);
-                    System.out.println("Se elimino");
-                    System.out.println("Quedan: " + brickWalls.size());
                 } else {
                     setOnMap(brickWalls.get(i));
                 }
             }
 
-            for (Bonus b : bonus) {
-                row = (int) ((b.getY() + 16) / 32 - 2);
-                col = (int) ((b.getX() + 16) / 32);
-                mapPositions[row][col] = BONUS;
-
-                if (mapPositions[row - 1][col] == 3 || mapPositions[row + 1][col] == 3
-                        || mapPositions[row][col - 1] == 3 || mapPositions[row][col + 1] == 3) {
-                    if (b.getClass() == Puerta.class && enemies.isEmpty()) {
-                        PLAY = false;
-                        CURRENT_STAGE++;
-                        CHANGE_STATE_COUNTER = 170;
-                        IS_CHANGE_STAGE = true;
-                        END_GAME = true;
-                    } else {
-                        b.activateBonus();
-                    }
-                }
-            }
-
             /*
-             * se setea en el mapa la posicion actual del heroe con un 3 (habiendo borrado
-             * anteriormente la ultima posicion en la que se encontraba)
+             * Se setea en el mapa la posicion actual del heroe con un 3 (habiendo borrado
+             * anteriormente la ultima posicion en la que se encontraba).
              */
             setOnMap(hero);
 
             /*
-             * movimiento de los enemigos
+             * Movimiento de los enemigos
              */
             for (int i = 0; i < enemies.size(); i++) {
                 Enemigo e = enemies.get(i);
 
                 /*
-                 * si el enemigo no esta muerto (esto por ahora se usa por controles de testeo,
-                 * lo ideal es quitarlo del vector una vez que fue tocado por una explosion)
+                 * Si el enemigo no esta muerto (esto se usa para saber cuando remover a los
+                 * enemigos, un enemigo estara muerto cuando su variable de estado IS_DEAD sea
+                 * cambiada por el metodo kill(), el cual hace la animacion de muerte del
+                 * enemigo).
                  */
                 if (!e.isDead()) {
                     /*
-                     * cambio de sprites segun la direccion que toma el enemigo (el enemigo toma
-                     * direcciones de forma aleatoria)
+                     * Si el enemigo fue golpeado por una explosion se comienza con la animacion de
+                     * muerte, sino, se lo mueve por el mapa.
                      */
-                    if (e.wasHit()) {
+                    if (e.wasHit() && e.getImmunityTime() == 0) {
                         e.kill();
                     } else {
                         e.changeObject(e.getCurrentDirection());
                     }
 
                     /*
-                     * se setea en el mapa la posicion actual del enemigo con un 2 (habiendo borrado
-                     * anteriormente la ultima posicion en la que se encontraba)
+                     * Se setea en el mapa la posicion actual del enemigo con un 2 (habiendo borrado
+                     * anteriormente la ultima posicion en la que se encontraba).
                      */
                     setOnMap(e);
 
+                    /*
+                     * Cambio de sprites segun la direccion que toma el enemigo.
+                     */
                     if (e.getCurrentDirection() == "up") {
                         /*
-                         * file y columna actual (con modificaciones con respecto al mapa porque sino
-                         * genera superposiciones entre sprites)
+                         * Fila y columna actual (con modificaciones con respecto al mapa porque sino
+                         * genera superposiciones entre sprites).
                          */
                         row = (int) (e.getY() + 20) / 32 - 2;
                         col = (int) e.getX() / 32;
 
                         /*
-                         * si la posicion de arriba no es una pared de piedra
+                         * El enemigo no puede pasar a traves de paredes de ladrillo, bonus y bombas
+                         * (las paredes de piedra se checkean de forma interna en cada enemigo).
                          */
-                        if (mapPositions[row - 1][col] != 1 && mapPositions[row - 1][col] != 4
-                                && mapPositions[row - 1][col] != 5 && mapPositions[row - 1][col] != 6) {
+                        if (mapPositions[row - 1][col] != 4 && mapPositions[row - 1][col] != 6) {
                             e.up(delta);
                         }
                         /*
-                         * si la posicion de arriba es el heroe
+                         * Si la posicion de arriba es el heroe.
                          */
                         if (mapPositions[row - 1][col] == 3) {
                             hero.stop();
@@ -606,21 +617,21 @@ public class Bomberman extends JGame implements ScreenStateListener {
                     }
                     if (e.getCurrentDirection() == "down") {
                         /*
-                         * file y columna actual (con modificaciones con respecto al mapa porque sino
-                         * genera superposiciones entre sprites)
+                         * Fila y columna actual (con modificaciones con respecto al mapa porque sino
+                         * genera superposiciones entre sprites).
                          */
                         row = (int) (e.getY() - 10) / 32 - 2;
                         col = (int) e.getX() / 32;
 
                         /*
-                         * si la posicion de arriba no es una pared de piedra
+                         * El enemigo no puede pasar a traves de paredes de ladrillo, bonus y bombas
+                         * (las paredes de piedra se checkean de forma interna en cada enemigo).
                          */
-                        if (mapPositions[row + 1][col] != 1 && mapPositions[row + 1][col] != 4
-                                && mapPositions[row + 1][col] != 5 && mapPositions[row + 1][col] != 6) {
+                        if (mapPositions[row + 1][col] != 4 && mapPositions[row + 1][col] != 6) {
                             e.down(delta);
                         }
                         /*
-                         * si la posicion de arriba es el heroe
+                         * Si la posicion de arriba es el heroe.
                          */
                         if (mapPositions[row + 1][col] == 3) {
                             hero.stop();
@@ -628,21 +639,21 @@ public class Bomberman extends JGame implements ScreenStateListener {
                     }
                     if (e.getCurrentDirection() == "left") {
                         /*
-                         * file y columna actual (con modificaciones con respecto al mapa porque sino
-                         * genera superposiciones entre sprites)
+                         * Fila y columna actual (con modificaciones con respecto al mapa porque sino
+                         * genera superposiciones entre sprites).
                          */
                         row = (int) e.getY() / 32 - 2;
                         col = (int) (e.getX() + 30) / 32;
 
                         /*
-                         * si la posicion de arriba no es una pared de piedra
+                         * El enemigo no puede pasar a traves de paredes de ladrillo, bonus y bombas
+                         * (las paredes de piedra se checkean de forma interna en cada enemigo).
                          */
-                        if (mapPositions[row][col - 1] != 1 && mapPositions[row][col - 1] != 4
-                                && mapPositions[row][col - 1] != 5 && mapPositions[row][col - 1] != 6) {
+                        if (mapPositions[row][col - 1] != 4 && mapPositions[row][col - 1] != 6) {
                             e.left(delta);
                         }
                         /*
-                         * si la posicion de arriba es el heroe
+                         * Si la posicion de arriba es el heroe.
                          */
                         if (mapPositions[row][col - 1] == 3) {
                             hero.stop();
@@ -650,21 +661,21 @@ public class Bomberman extends JGame implements ScreenStateListener {
                     }
                     if (e.getCurrentDirection() == "right") {
                         /*
-                         * file y columna actual (con modificaciones con respecto al mapa porque sino
-                         * genera superposiciones entre sprites)
+                         * Fila y columna actual (con modificaciones con respecto al mapa porque sino
+                         * genera superposiciones entre sprites).
                          */
                         row = (int) (e.getY() + 14) / 32 - 2;
                         col = (int) (e.getX()) / 32;
 
                         /*
-                         * si la posicion de arriba no es una pared de piedra
+                         * El enemigo no puede pasar a traves de paredes de ladrillo, bonus y bombas
+                         * (las paredes de piedra se checkean de forma interna en cada enemigo).
                          */
-                        if (mapPositions[row][col + 1] != 1 && mapPositions[row][col + 1] != 4
-                                && mapPositions[row][col + 1] != 5 && mapPositions[row][col + 1] != 6) {
+                        if (mapPositions[row][col + 1] != 4 && mapPositions[row][col + 1] != 6) {
                             e.right(delta);
                         }
                         /*
-                         * si la posicion de arriba es el heroe
+                         * Si la posicion de arriba es el heroe.
                          */
                         if (mapPositions[row][col + 1] == 3) {
                             hero.stop();
@@ -676,11 +687,14 @@ public class Bomberman extends JGame implements ScreenStateListener {
             }
 
             /*
-             * movimiento de heroe, los comentarios para los enemigos aplican para el heroe.
-             * Se cambian los sprites segun una direccion, se calcula la fila y columna
-             * actual (con alguna modificaciones por superposicion de sprites), se checkea
-             * si el heroe va a chocar contra un enemigo (en ese caso perdera una vida) y se
-             * checkea que no pase por las paredes de ladrillo
+             * Movimiento de heroe.
+             * 
+             * Los comentarios para los enemigos aplican para el heroe. Se cambian los
+             * sprites segun una direccion, se calcula la fila y columna actual (con alguna
+             * modificaciones por superposicion de sprites), se checkea si el heroe va a
+             * chocar contra un enemigo (en ese caso perdera una vida), si va a chocar
+             * contra un bonus y se checkea que no pase por las paredes de ladrillo, piedra
+             * y bombas (en caso de no tener el bonus de saltar bombas).
              */
             if (keyboard.isKeyPressed(playerKeys.get("Arriba"))) {
                 hero.changeObject("up");
@@ -690,8 +704,11 @@ public class Bomberman extends JGame implements ScreenStateListener {
 
                 if (mapPositions[row - 1][col] == 2) {
                     hero.stop();
+                } else if (mapPositions[row - 1][col] == 5) {
+                    hero.consumeBonus(checkForBonus(row - 1, col));
+                    mapPositions[row - 1][col] = 0;
                 } else if (mapPositions[row - 1][col] != 1 && mapPositions[row - 1][col] != 4
-                        && mapPositions[row - 1][col] != 5 && mapPositions[row - 1][col] != 6) {
+                        && mapPositions[row - 1][col] != 6) {
                     hero.up(delta);
                 }
             }
@@ -704,8 +721,11 @@ public class Bomberman extends JGame implements ScreenStateListener {
 
                 if (mapPositions[row + 1][col] == 2) {
                     hero.stop();
+                } else if (mapPositions[row + 1][col] == 5) {
+                    hero.consumeBonus(checkForBonus(row + 1, col));
+                    mapPositions[row + 1][col] = 0;
                 } else if (mapPositions[row + 1][col] != 1 && mapPositions[row + 1][col] != 4
-                        && mapPositions[row + 1][col] != 5 && mapPositions[row + 1][col] != 6) {
+                        && mapPositions[row + 1][col] != 6) {
                     hero.down(delta);
                 }
             }
@@ -718,8 +738,11 @@ public class Bomberman extends JGame implements ScreenStateListener {
 
                 if (mapPositions[row][col - 1] == 2) {
                     hero.stop();
+                } else if (mapPositions[row][col - 1] == 5) {
+                    hero.consumeBonus(checkForBonus(row, col - 1));
+                    mapPositions[row][col - 1] = 0;
                 } else if (mapPositions[row][col - 1] != 1 && mapPositions[row][col - 1] != 4
-                        && mapPositions[row][col - 1] != 5 && mapPositions[row][col - 1] != 6) {
+                        && mapPositions[row][col - 1] != 6) {
                     hero.left(delta);
                 }
             }
@@ -732,86 +755,18 @@ public class Bomberman extends JGame implements ScreenStateListener {
 
                 if (mapPositions[row][col + 1] == 2) {
                     hero.stop();
+                } else if (mapPositions[row][col + 1] == 5) {
+                    hero.consumeBonus(checkForBonus(row, col + 1));
+                    mapPositions[row][col + 1] = 0;
                 } else if (mapPositions[row][col + 1] != 1 && mapPositions[row][col + 1] != 4
-                        && mapPositions[row][col + 1] != 5 && mapPositions[row][col + 1] != 6) {
+                        && mapPositions[row][col + 1] != 6) {
                     hero.right(delta);
                 }
             }
 
-            for (int i = 0; i < explosions.size(); i++) {
-                Explosion e = explosions.get(i);
-
-                /*
-                 * si alguna explosion todavia no se desvanecio se sigue con su animacion
-                 */
-                if (!e.isVanished()) {
-                    e.changeObject();
-
-                    row = (int) ((e.getY() + 16) / 32 - 2);
-                    col = (int) ((e.getX() + 16) / 32);
-
-                    if (mapPositions[row][col] == 3) {
-                        hero.stop();
-                    }
-                    if (mapPositions[row][col] == 2) {
-                        for (int j = 0; j < enemies.size(); j++) {
-                            if (isInside(e, enemies.get(j)) && !enemies.get(j).wasHit()) {
-                                enemies.get(j).stop();
-                            }
-                        }
-                    }
-                    if (mapPositions[row][col] == 1 || mapPositions[row][col] == 4 || mapPositions[row][col] == 5) {
-                        if (mapPositions[row][col] == 4 || mapPositions[row][col] == 5) {
-                            for (Pared bw : brickWalls) {
-                                if (isInside(e, bw)) {
-                                    bw.hit();
-                                    System.out.println("Se golpeo");
-                                    break;
-                                }
-                            }
-                        }
-
-                        break;
-                    }
-
-                    for (Vector<ParteExplosion> vDir : e.getExplosion().values()) {
-                        for (ParteExplosion pe : vDir) {
-                            row = (int) ((pe.getY() + 16) / 32 - 2);
-                            col = (int) ((pe.getX() + 16) / 32);
-
-                            /*
-                             * si el heroe esta dentro de la explosion
-                             */
-                            if (isInside(pe, hero)) {
-                                hero.stop();
-                            }
-                            if (mapPositions[row][col] == 2) {
-                                for (int k = 0; k < enemies.size(); k++) {
-                                    if (isInside(pe, enemies.get(k)) && !enemies.get(k).wasHit()) {
-                                        enemies.get(k).stop();
-                                    }
-                                }
-                            }
-                            if (mapPositions[row][col] == 1 || mapPositions[row][col] == 4
-                                    || mapPositions[row][col] == 5) {
-                                if (mapPositions[row][col] == 4 || mapPositions[row][col] == 5) {
-                                    for (Pared bw : brickWalls) {
-                                        if (isInside(pe, bw)) {
-                                            bw.hit();
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    explosions.remove(i);
-                }
-            }
-
+            /*
+             * La camara seguira al reloj, puntaje, vidas del heroe y al heroe
+             */
             cam.followUpperPanel(clock, points, life);
             cam.followHero(hero);
         } else {
@@ -837,20 +792,125 @@ public class Bomberman extends JGame implements ScreenStateListener {
         }
 
         /*
-         * se checkea que na haya mas bombas de las que el heroe puede usar (sin bonus)
+         * Controles para las explosiones y los objetos que golpean
          */
-        if (bombs.size() <= 2 && !Bomba.isActive()) {
+        for (int i = 0; i < explosions.size(); i++) {
+            Explosion e = explosions.get(i);
+
             /*
-             * se checkea que haya bombas y explosiones para ir quitando del mapa y que no
-             * haya ninguna explosion activa (solo se puede explotar una bomba y luego
-             * colocar otra cuando la anterior se desvanecio)
+             * Si alguna explosion todavia no se desvanecio se sigue con su animacion, sino,
+             * se la quita.
              */
-            if (!bombs.isEmpty()) {
-                bombs.remove(0);
+            if (!e.isVanished()) {
+                e.changeObject();
+
+                row = (int) ((e.getY() + 16) / 32 - 2);
+                col = (int) ((e.getX() + 16) / 32);
+
+                if (mapPositions[row][col] == 3 && !hero.isDead()) {
+                    hero.stop();
+                }
+                if (mapPositions[row][col] == 2) {
+                    for (int j = 0; j < enemies.size(); j++) {
+                        if (isInside(e, enemies.get(j)) && !enemies.get(j).wasHit()
+                                && enemies.get(j).getImmunityTime() == 0) {
+                            enemies.get(j).stop();
+                            if (enemies.get(j).getClass() == EnemigoRosa.class) {
+                                points.setScore(points.getScore() + 100);
+                            } else if (enemies.get(j).getClass() == EnemigoAzul.class) {
+                                points.setScore(points.getScore() + 150);
+                            }
+                        }
+                    }
+                }
+                if (mapPositions[row][col] == 1 || mapPositions[row][col] == 4 || mapPositions[row][col] == 5) {
+                    if (mapPositions[row][col] == 4 || mapPositions[row][col] == 5) {
+                        for (Pared bw : brickWalls) {
+                            if (isInside(e, bw)) {
+                                bw.hit();
+                                break;
+                            }
+                        }
+                    }
+
+                    break;
+                }
+
+                for (Vector<ParteExplosion> vDir : e.getExplosion().values()) {
+                    for (ParteExplosion pe : vDir) {
+                        row = (int) ((pe.getY() + 16) / 32 - 2);
+                        col = (int) ((pe.getX() + 16) / 32);
+
+                        /*
+                         * si el heroe esta dentro de la explosion
+                         */
+                        if (isInside(pe, hero) && !hero.isDead()) {
+                            hero.stop();
+                        }
+                        if (mapPositions[row][col] == 2) {
+                            for (int k = 0; k < enemies.size(); k++) {
+                                if (isInside(pe, enemies.get(k)) && !enemies.get(k).wasHit()
+                                        && enemies.get(k).getImmunityTime() == 0) {
+                                    enemies.get(k).stop();
+                                    if (enemies.get(k).getClass() == EnemigoRosa.class) {
+                                        points.setScore(points.getScore() + 100);
+                                    } else if (enemies.get(k).getClass() == EnemigoAzul.class) {
+                                        points.setScore(points.getScore() + 150);
+                                    }
+                                }
+                            }
+                        }
+                        /*
+                         * si la explosión alcanza un bonus que no este cubierto por una pared(de eso se
+                         * ocupa el segundo "for" con la ayuda del booleano BONUS_CONTROLLER).Primero se
+                         * agregan 6 enemigo azules al vector de enemigos a los que se les asigna la
+                         * posición de dicho bonus. Posterior a eso se elimina ese bonus del vector
+                         * correspondiente.
+                         */
+                        /*
+                         * Si la exploción alcanza a otra bomba hace que esta se detone
+                         */
+                        if (mapPositions[row][col] == 5) {
+                            for (int k = 0; k < bonus.size(); k++) {
+                                if (isInside(pe, bonus.get(k))) {
+                                    boolean BONUS_CONTROLLER = true;
+                                    for (Pared bw : brickWalls) {
+                                        if (isInside(bw, bonus.get(k))) {
+                                            BONUS_CONTROLLER = false;
+                                            break;
+                                        }
+                                    }
+                                    if (BONUS_CONTROLLER) {
+                                        bonus.get(k).hit();
+                                        enemies.addAll(bonus.get(k).spawnEnemies());
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        if (mapPositions[row][col] == 1 || mapPositions[row][col] == 4 || mapPositions[row][col] == 5) {
+                            if (mapPositions[row][col] == 4 || mapPositions[row][col] == 5) {
+                                for (Pared bw : brickWalls) {
+                                    if (isInside(pe, bw)) {
+                                        bw.hit();
+                                        break;
+                                    }
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            } else {
+                explosions.remove(i);
             }
         }
     }
 
+    /*
+     * metodo para setear en el mapa los diferentes objetos graficos
+     */
     private void setOnMap(ObjetoGrafico o) {
         int row = (int) ((o.getY() + 16) / 32 - 2);
         int col = (int) ((o.getX() + 16) / 32);
@@ -869,6 +929,49 @@ public class Bomberman extends JGame implements ScreenStateListener {
     }
 
     /*
+     * metodo para checkear con que bonus el heroe va a chocar
+     */
+    private Bonus checkForBonus(int row, int col) {
+        int rowB;
+        int colB;
+        Bonus b;
+
+        for (int i = 0; i < bonus.size(); i++) {
+            b = bonus.get(i);
+            rowB = (int) (b.getY() / 32 - 2);
+            colB = (int) (b.getX() / 32);
+
+            if (rowB == row && colB == col) {
+                if (b.getClass() == Puerta.class) {
+                    points.setScore(points.getScore() + 200);
+                } else {
+                    points.setScore(points.getScore() + 50);
+                }
+
+                bonus.remove(i);
+                return b;
+            }
+        }
+
+        return null;
+    }
+
+    /*
+     * metodo para checkear si o2 esta dentro de o1
+     */
+    private boolean isInside(ObjetoGrafico o, Bonus b) {
+        boolean INSIDE_LEFT_RIGHT = (o.getX() <= b.getX() && b.getX() <= o.getX() + 30
+                || o.getX() <= b.getX() + 28 && b.getX() + 28 <= o.getX() + 30) && o.getY() <= b.getY() + 16
+                && b.getY() + 16 <= o.getY() + 30;
+
+        boolean INSIDE_UP_DOWN = (o.getY() <= b.getY() + 28 && b.getY() + 28 <= o.getY() + 30
+                || o.getY() <= b.getY() && b.getY() <= o.getY() + 30) && o.getX() <= b.getX() + 16
+                && b.getX() + 16 <= o.getX() + 30;
+
+        return INSIDE_LEFT_RIGHT || INSIDE_UP_DOWN;
+    }
+
+    /*
      * metodo para checkear si o2 esta dentro de o1
      */
     private boolean isInside(ObjetoGrafico o1, ObjetoGrafico o2) {
@@ -883,6 +986,9 @@ public class Bomberman extends JGame implements ScreenStateListener {
         return INSIDE_LEFT_RIGHT || INSIDE_UP_DOWN;
     }
 
+    /*
+     * metodo para cargar el ranking de jugadores
+     */
     private void getRaking() {
         DB sqlt = new DB();
         sqlt.initDBConn();
@@ -901,8 +1007,6 @@ public class Bomberman extends JGame implements ScreenStateListener {
 
     @Override
     public void gameStartup() {
-        readPropertiesFile();
-
         if (!PLAY) {
             /*
              * se inicia la camara y su region visible, el fondo de comienzo como pantalla
@@ -910,7 +1014,7 @@ public class Bomberman extends JGame implements ScreenStateListener {
              * "Continuar", y el se toma la instancia del mundo
              */
             cam = new Camara(0, 0);
-            cam.setVisibleRegion(640);
+            cam.setVisibleRegion(Mundo.WORLD_WIDTH);
             bg = new Fondo("/imagenes/start_screen.png");
             world = Mundo.getInstance();
 
@@ -940,9 +1044,9 @@ public class Bomberman extends JGame implements ScreenStateListener {
              */
             OGAbstractFactory factory = OGFactoryProducer.getFactory();
             walls.addAll(factory.getParedes(Pared.PARED_PIEDRA, BORDER_WALLS + INTERIOR_WALLS));
-            brickWalls.addAll(factory.getParedes(Pared.PARED_LADRILLO, 30));
+            brickWalls.addAll(factory.getParedes(Pared.PARED_LADRILLO, BRICK_WALLS));
 
-            enemies.addAll(factory.getEnemigos(Enemigo.ENEMIGO_ROSA, 1));
+            enemies.addAll(factory.getEnemigos(Enemigo.ENEMIGO_ROSA, 6));
 
             /*
              * eligiendo dos bonus de forma aleatoria
@@ -1029,7 +1133,7 @@ public class Bomberman extends JGame implements ScreenStateListener {
              * posicionando bonus
              */
             for (Bonus b : bonus) {
-                Pared bw = brickWalls.get(r.nextInt(30));
+                Pared bw = brickWalls.get(r.nextInt(BRICK_WALLS));
                 b.setPosition(bw.getX(), bw.getY());
 
                 int row = (int) (b.getY() / 32 - 2);
@@ -1080,7 +1184,6 @@ public class Bomberman extends JGame implements ScreenStateListener {
 
     @Override
     public void gameShutdown() {
-
     }
 
     @Override
@@ -1098,19 +1201,12 @@ public class Bomberman extends JGame implements ScreenStateListener {
         for (String key : SettingsController.getCustomKeys().keySet()) {
             playerKeys.put(key, Integer.parseInt(SettingsController.getCustomKeys().get(key)));
         }
-    }
 
-    @Override
-    public void stateChanged(boolean newState) {
-        /*
-         * necesito acceso al JFrame!
-         */
-        // if(newState) {
-        // mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        // }
-        // else {
-        // mainFrame.setSize(500, 400);
-        // mainFrame.setLocationRelativeTo(null);
+        // if(FULL_SCREEN) {
+        // Mundo.WORLD_WIDTH = (int)
+        // Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+        // Mundo.WORLD_HEIGHT = (int)
+        // Toolkit.getDefaultToolkit().getScreenSize().getHeight();
         // }
     }
 }

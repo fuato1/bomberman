@@ -12,6 +12,7 @@ public abstract class Enemigo extends ObjetoGrafico implements ObjetoCambianteMo
     public final static int ENEMIGO_AZUL = 1;
 
     private final double ENEMY_DISPLACEMENT = 100.0;
+    protected int IMMUNITY = 0;
     protected int ENEMY_MOVING_TIME = 30;
     protected String directions[] = { "up", "down", "left", "right" };
     protected String CURRENT_DIRECTION;
@@ -56,11 +57,19 @@ public abstract class Enemigo extends ObjetoGrafico implements ObjetoCambianteMo
         return this.WAS_HIT;
     }
 
+    public int getImmunityTime() {
+        return IMMUNITY;
+    }
+
     /*
         Setters
     */
     public void stop() {
         this.WAS_HIT = true;
+    }
+
+    public void setImmunityTime(int IMMUNITY) {
+        this.IMMUNITY = IMMUNITY;
     }
 
     public void checkVerticalMovement() {

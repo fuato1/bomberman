@@ -21,7 +21,7 @@ public class SettingsView extends JPanel implements ScreenStateListener {
     private ButtonsPanel buttonsPanel;
 
     private SettingsView() {
-        mainFrame = new JFrame("Settings");
+        mainFrame = new JFrame("Configuración del Jugador");
 
         // leyendo la config de properties.json
         SettingsController.readSettings();

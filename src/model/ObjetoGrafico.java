@@ -39,17 +39,6 @@ public abstract class ObjetoGrafico {
 		return this.position.getY();
     }
 
-    public void checkAnimationCounter(int n) {
-        if(ANIMATION_COUNTER > n)
-            ANIMATION_COUNTER = 0;
-        else if(ANIMATION_COUNTER >= n-10) {
-            this.update("/imagenes/null.png");
-            ANIMATION_COUNTER++;
-        }
-        else
-            ANIMATION_COUNTER++;
-    }
-
     /*
         Setters
     */

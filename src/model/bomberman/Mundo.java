@@ -4,8 +4,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 public class Mundo {
-    public final static int WORLD_WIDTH = 640;
-    public final static int WORLD_HEIGHT = 480;
+    public static int WORLD_WIDTH = 640;
+    public static int WORLD_HEIGHT = 480;
 
     private static Mundo INSTANCE = null;
     private Rectangle2D world;

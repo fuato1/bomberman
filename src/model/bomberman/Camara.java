@@ -54,8 +54,8 @@ public class Camara {
 		}
 		else {
 			c.setX(32);
-			s.setX(500);
-			l.setX(300);
+			s.setX(17*32);
+			l.setX(9*32);
 		}
 	}
 }

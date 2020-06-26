@@ -48,19 +48,13 @@ public class ButtonsPanel extends JPanel implements ActionListener {
 
     // guardar config
     private void saveConfig() {
-        System.out.println("save");
         bl.saveButtonActioned();
-
         SettingsController.saveSettings();
-        System.out.println(SettingsController.show());
     }
 
     // reiniciar config
     private void resetConfig() {
-        System.out.println("reset");
         bl.resetButtonActioned();
-        
         SettingsController.saveSettings();
-        System.out.println(SettingsController.show());
     }
 }

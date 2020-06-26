@@ -10,36 +10,35 @@ import model.interfaces.ObjetoCambianteEstatico;
 
 public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico {
     /*
-        direcciones de la explosion
-    */
+     * direcciones de la explosion
+     */
     public final static int EXPLOSION_UP = 1;
     public final static int EXPLOSION_DOWN = 2;
     public final static int EXPLOSION_LEFT = 3;
     public final static int EXPLOSION_RIGHT = 4;
 
     private boolean vanishedExplosion = false;
+    private int range = 1;
 
     HashMap<String, Vector<ParteExplosion>> explosion;
 
-    public Explosion(String filename) {
+    public Explosion(String filename, int range) {
         super(filename);
+        this.range = range;
 
         explosion = new HashMap<String, Vector<ParteExplosion>>(4);
 
         OGAbstractFactory factory = OGFactoryProducer.getFactory();
 
-        explosion.put("up", factory.getTipExplosion(EXPLOSION_UP));
-
-        explosion.put("down", factory.getTipExplosion(EXPLOSION_DOWN));
-
-        explosion.put("left", factory.getTipExplosion(EXPLOSION_LEFT));
-
-        explosion.put("right", factory.getTipExplosion(EXPLOSION_RIGHT));
+        explosion.put("up", factory.getExplosionBranch(EXPLOSION_UP, range));
+        explosion.put("down", factory.getExplosionBranch(EXPLOSION_DOWN, range));
+        explosion.put("left", factory.getExplosionBranch(EXPLOSION_LEFT, range));
+        explosion.put("right", factory.getExplosionBranch(EXPLOSION_RIGHT, range));
     }
 
     /*
-        Getters
-    */
+     * Getters
+     */
     public HashMap<String, Vector<ParteExplosion>> getExplosion() {
         return explosion;
     }
@@ -49,8 +48,8 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
     }
 
     /*
-        Setters
-    */
+     * Setters
+     */
     @Override
     public void setPosition(double x, double y) {
         super.setPosition(x, y);
@@ -59,54 +58,49 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
 
     private void setExplosion() {
         for (String dir : explosion.keySet()) {
-            if(dir == "up") {
+            if (dir == "up") {
                 for (int i = 0; i < explosion.get(dir).size(); i++) {
-                    explosion.get(dir).get(i).setPosition(getX(), getY() - 28*(i+1));
+                    explosion.get(dir).get(i).setPosition(getX(), getY() - 28 * (i + 1));
                 }
-            }
-            else if(dir == "down") {
+            } else if (dir == "down") {
                 for (int i = 0; i < explosion.get(dir).size(); i++) {
-                    explosion.get(dir).get(i).setPosition(getX(), getY() + 28*(i+1));
+                    explosion.get(dir).get(i).setPosition(getX(), getY() + 28 * (i + 1));
                 }
-            }
-            else if(dir == "left") {
+            } else if (dir == "left") {
                 for (int i = 0; i < explosion.get(dir).size(); i++) {
-                    explosion.get(dir).get(i).setPosition(getX() - 28*(i+1), getY());
+                    explosion.get(dir).get(i).setPosition(getX() - 28 * (i + 1), getY());
                 }
-            }
-            else if(dir == "right") {
+            } else if (dir == "right") {
                 for (int i = 0; i < explosion.get(dir).size(); i++) {
-                    explosion.get(dir).get(i).setPosition(getX() + 28*(i+1), getY());
+                    explosion.get(dir).get(i).setPosition(getX() + 28 * (i + 1), getY());
                 }
             }
         }
     }
 
     /*
-        cambio de sprites
-    */
+     * cambio de sprites
+     */
     @Override
     public void changeObject() {
-        if(ANIMATION_COUNTER > 60) {
+        if (ANIMATION_COUNTER > 60) {
             ANIMATION_COUNTER = 60;
             vanishedExplosion = true;
-        }
-        else if(ANIMATION_COUNTER >= 50) {
+        } else if (ANIMATION_COUNTER >= 50) {
             for (String dir : explosion.keySet()) {
                 for (ParteExplosion pe : explosion.get(dir)) {
                     pe.changeObject();
                 }
             }
             update("/imagenes/null.png");
-            
+
             ANIMATION_COUNTER++;
-        }
-        else {
+        } else {
             for (int i = 10; i <= 40; i += 10) {
-                if(i-10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i)
-                    update("/imagenes/explosiones/center/center_exp-" + (50-i)/10 + ".png");
+                if (i - 10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i)
+                    update("/imagenes/explosiones/center/center_exp-" + (50 - i) / 10 + ".png");
             }
-    
+
             for (String dir : explosion.keySet()) {
                 for (ParteExplosion pe : explosion.get(dir)) {
                     pe.changeObject();
