@@ -2,6 +2,7 @@ package model.properties.view;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -9,7 +10,7 @@ import javax.swing.JPanel;
 import model.properties.controller.SettingsController;
 import model.properties.view.views_listeners.ScreenStateListener;
 
-public class SettingsView extends JPanel implements ScreenStateListener {
+public class SettingsView extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // instancia de la interfaz
@@ -27,7 +28,6 @@ public class SettingsView extends JPanel implements ScreenStateListener {
         SettingsController.readSettings();
 
         optionsPanel = new OptionsPanel(new GridBagLayout());
-        optionsPanel.addScreenStateListener(this);
 
         buttonsPanel = new ButtonsPanel(new GridBagLayout());
         buttonsPanel.addButtonListener(optionsPanel);
@@ -53,7 +53,7 @@ public class SettingsView extends JPanel implements ScreenStateListener {
         gbc.gridy = 1;
         this.add(buttonsPanel, gbc);
 
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         mainFrame.setSize(500, 400);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setResizable(false);
@@ -61,13 +61,11 @@ public class SettingsView extends JPanel implements ScreenStateListener {
         mainFrame.setVisible(true);
     }
 
-    public void stateChanged(boolean newState) {
-        if(newState) {
-            mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        }
-        else {
-            mainFrame.setSize(500, 400);
-            mainFrame.setLocationRelativeTo(null);
-        }
+    public void addOptionsPanelSSL(ScreenStateListener ssl) {
+        optionsPanel.addScreenStateListener(ssl);
+    }
+
+    public void closeConfig() {
+        mainFrame.dispatchEvent(new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING));
     }
 }

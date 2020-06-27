@@ -80,11 +80,6 @@ public class SettingsController {
     public static void initView() {
         view.initUx();
     }
-    
-    // para test
-    public static String show() {
-        return model.toString();
-    }
 
     /*
         Getters  
@@ -122,6 +117,10 @@ public class SettingsController {
 
     public static void setSoundState(boolean state) {
         model.setSound(state);
+    }
+
+    public static void closeConfig() {
+        view.closeConfig();
     }
 
     /*

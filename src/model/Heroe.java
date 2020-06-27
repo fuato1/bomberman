@@ -22,6 +22,7 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     private boolean HAS_DETONATOR = false;
     private boolean CAN_JUMP_BOMBS = false;
     private int EXPLOSION_RANGE = 1;
+    private boolean HAS_REACHED_DOOR = false;
 
     public Heroe() {
         super("/imagenes/bomberman/down/b_down-1.png");
@@ -54,6 +55,10 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
 
     public int getExplosionRange() {
         return EXPLOSION_RANGE;
+    }
+
+    public boolean hasReachedDoor() {
+        return HAS_REACHED_DOOR;
     }
 
     public boolean isOverWall() {
@@ -97,6 +102,10 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
 
     public void setExplosionRange(int EXPLOSION_RANGE) {
         this.EXPLOSION_RANGE = EXPLOSION_RANGE;
+    }
+
+    public void setHasReachedDoor(boolean HAS_REACHED_DOOR) {
+        this.HAS_REACHED_DOOR = HAS_REACHED_DOOR;
     }
 
     public void consumeBonus(Bonus b) {

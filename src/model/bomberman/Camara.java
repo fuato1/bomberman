@@ -32,6 +32,11 @@ public class Camara {
 		resX = x;
 	}
 
+	public void reset() {
+		x = 0;
+		y = 0;
+	}
+
 	/*
 		Seguimiento del heroe y el panel superior
 	*/

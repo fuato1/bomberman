@@ -117,11 +117,27 @@ public class Bomberman extends JGame {
     private boolean IS_CHANGE_STAGE = false;
     private int CHANGE_STATE_COUNTER = 170;
     private int CURRENT_STAGE = 1;
+    private int BONUS_PER_STAGE = 2;
 
     Random r = new Random(System.currentTimeMillis());
 
     public Bomberman() {
         super("Bomberman", Mundo.WORLD_WIDTH, Mundo.WORLD_HEIGHT);
+
+        SettingsController.readSettings();
+
+        player = SistemaJuegos.player;
+        player.setNickName(SettingsController.getPlayerName()); // nombre del jugador
+
+        FULL_SCREEN = SettingsController.getFullScreenState(); // estado de la pantalla completa
+        SOUND = SettingsController.getSoundState(); // estado del sonido
+
+        playerKeys = new HashMap<String,
+        Integer>(SettingsController.getCustomKeys().size()); // teclas del juego
+
+        for (String key : SettingsController.getCustomKeys().keySet()) {
+            playerKeys.put(key, Integer.parseInt(SettingsController.getCustomKeys().get(key)));
+        }
     }
 
     public void showMap() {
@@ -237,30 +253,20 @@ public class Bomberman extends JGame {
         bg.setImage("/imagenes/black.png");
         bg.draw(g);
 
-        // g.setColor(Color.black);
-        // g.drawString("Ranking: ", 280, 50);
         g.setColor(Color.white);
         g.drawString("Ranking: ", 282, 50);
 
         if (END_GAME) {
-            // g.setColor(Color.black);
-            // g.drawString("Press 'R' to play again", 100, 460);
             g.setColor(Color.white);
             g.drawString("Press 'R' to play again", 102, 460);
         }
 
-        // g.setColor(Color.black);
-        // g.drawString("Press 'Esc' to exit", 400, 460);
         g.setColor(Color.white);
         g.drawString("Press 'Esc' to exit", 402, 460);
 
         Jugador player;
         for (int i = 0; i < ranking.getScores().size(); i++) {
             player = ranking.getScores().get(i);
-
-            // g.setColor(Color.black);
-            // g.drawString(player.getNickName() + ": " + player.getScore(), 280, 140 + 32 *
-            // (i));
 
             g.setColor(Color.white);
             g.drawString(player.getNickName() + ": " + player.getScore(), 282, 140 + 32 * (i));
@@ -271,8 +277,6 @@ public class Bomberman extends JGame {
         bg.setImage("/imagenes/black.png");
         bg.draw(g);
 
-        // g.setColor(Color.black);
-        // g.drawString("Stage " + CURRENT_STAGE, 300, 240);
         g.setColor(Color.white);
         g.drawString("Stage " + CURRENT_STAGE, 302, 240);
 
@@ -280,15 +284,15 @@ public class Bomberman extends JGame {
         // fx.play();
 
         if (CHANGE_STATE_COUNTER == 0) {
-            if (CURRENT_STAGE == 2) {
-                IS_CHANGE_STAGE = false;
-                // fx.stop();
-            } else {
-                PLAY = true;
-                IS_CHANGE_STAGE = false;
-                // fx.stop();
+            PLAY = true;
+            IS_CHANGE_STAGE = false;
+            // fx.stop();
 
+            if(CURRENT_STAGE == 1) {
                 gameStartup();
+            }
+            else {
+                generateNextLevel();
             }
         }
     }
@@ -462,7 +466,7 @@ public class Bomberman extends JGame {
         int row;
         int col;
 
-        if (!hero.isDead()) {
+        if (!hero.isDead() && !hero.hasReachedDoor()) {
             /*
              * se itera sobre el mapa para setear las posiciones del heroe y los enemigos en
              * 0 y liberar los espacios por los que se van moviendo
@@ -769,6 +773,12 @@ public class Bomberman extends JGame {
              */
             cam.followUpperPanel(clock, points, life);
             cam.followHero(hero);
+        } else if (hero.hasReachedDoor() && enemies.isEmpty()) {
+            PLAY = false;
+            IS_MAIN_SCREEN = false;
+            IS_CHANGE_STAGE = true;
+            CHANGE_STATE_COUNTER = 170;
+            CURRENT_STAGE++;
         } else {
             if (hero.getLife() > 0) {
                 hero.kill();
@@ -1005,6 +1015,148 @@ public class Bomberman extends JGame {
         }
     }
 
+    /*
+     * metodos para generar posiciones para las paredes de ladrillo, bonus y
+     * enemigos
+     */
+    private void positionBrickWalls() {
+        for (Pared bw : brickWalls) {
+            double x = LEFT_WALL_LIMIT + 32 * (2 * (r.nextInt(11)));
+            double y = UPPER_WALL_LIMIT + 32 * (2 * (r.nextInt(5)));
+
+            int row = (int) y / 32 - 2;
+            int col = (int) x / 32;
+
+            boolean NULL_WALL_POS1 = row == 1 && col == 1;
+            boolean NULL_WALL_POS2 = row == 1 && col == 2;
+            boolean NULL_WALL_POS3 = row == 2 && col == 1;
+
+            while (mapPositions[row][col] == 1 || mapPositions[row][col] == 4 || NULL_WALL_POS1 || NULL_WALL_POS2
+                    || NULL_WALL_POS3) {
+                x = LEFT_WALL_LIMIT + 32 * (2 * (r.nextInt(11)));
+                y = UPPER_WALL_LIMIT + 32 * (2 * (r.nextInt(5)));
+
+                row = (int) (y / 32 - 2);
+                col = (int) (x / 32);
+
+                NULL_WALL_POS1 = row == 1 && col == 1;
+                NULL_WALL_POS2 = row == 1 && col == 2;
+                NULL_WALL_POS3 = row == 2 && col == 1;
+            }
+
+            bw.setPosition(x, y);
+            mapPositions[row][col] = 4;
+        }
+    }
+
+    private void positionBonus() {
+        for (Bonus b : bonus) {
+            Pared bw = brickWalls.get(r.nextInt(BRICK_WALLS));
+            b.setPosition(bw.getX(), bw.getY());
+
+            int row = (int) (b.getY() / 32 - 2);
+            int col = (int) (b.getX() / 32);
+
+            while (mapPositions[row][col] == 5) {
+                bw = brickWalls.get(r.nextInt(2));
+                b.setPosition(bw.getX(), bw.getY());
+
+                row = (int) (b.getY() / 32 - 2);
+                col = (int) (b.getX() / 32);
+            }
+
+            mapPositions[row][col] = 5;
+        }
+
+    }
+
+    private void positionEnemies() {
+        for (Enemigo e : enemies) {
+            double x = LEFT_WALL_LIMIT + 32 * (2 * (r.nextInt(11)));
+            double y = UPPER_WALL_LIMIT + 32 * (2 * (r.nextInt(5)));
+
+            int row = (int) (y / 32 - 2);
+            int col = (int) (x / 32);
+
+            boolean NULL_WALL_POS = mapPositions[row][col] == 1;
+            boolean NULL_HERO_POS = mapPositions[row][col] == 3;
+            boolean NULL_BRICK_WALL_POS = mapPositions[row][col] == 4;
+
+            while (NULL_WALL_POS || NULL_HERO_POS || NULL_BRICK_WALL_POS) {
+                x = LEFT_WALL_LIMIT + 32 * (2 * (r.nextInt(11)));
+                y = UPPER_WALL_LIMIT + 32 * (2 * (r.nextInt(5)));
+
+                row = (int) (y / 32 - 2);
+                col = (int) (x / 32);
+
+                NULL_WALL_POS = mapPositions[row][col] == 1;
+                NULL_HERO_POS = mapPositions[row][col] == 3;
+                NULL_BRICK_WALL_POS = mapPositions[row][col] == 4;
+            }
+
+            e.setPosition(x, y);
+            mapPositions[row][col] = 2;
+        }
+    }
+
+    /*
+     * metodo para generar un nuevo nivel
+     */
+    private void generateNextLevel() {
+        OGAbstractFactory factory = OGFactoryProducer.getFactory();
+
+        hero.setHasReachedDoor(false);
+        cam.reset();
+
+        /*
+            Se eliminan todos los bonus, bombas y explosiones que puedan haber quedado en el
+            mapa anterior
+        */
+        bonus.removeAllElements();
+        bombs.removeAllElements();
+        explosions.removeAllElements();
+
+        clock.setTime(200);
+        mapPositions = new int[13][25];
+
+        /*
+         * Se crean los nuevos enemigos para el nivel.
+         */
+        enemies.addAll(factory.getEnemigos(Enemigo.ENEMIGO_ROSA, 6));
+
+        /*
+         * Se quitan los bonus del mapa anterior y se eligen nuevos (cada nivel habra 2
+         * bonus adicionales).
+         */
+        for (int i = 0; i < BONUS_PER_STAGE; i++) {
+            bonus.add(factory.getBonus(r.nextInt(6)));
+        }
+        bonus.add(factory.getBonus(Bonus.PUERTA));
+
+        brickWalls.addAll(factory.getParedes(Pared.PARED_LADRILLO, BRICK_WALLS-brickWalls.size()));
+
+        /*
+         * posicionando heroe
+         */
+        hero.setPosition(LEFT_WALL_LIMIT + 2, UPPER_WALL_LIMIT + 2);
+        mapPositions[1][1] = 3;
+
+        /*
+         * posicionando a las paredes de ladrillo
+         */
+        positionBrickWalls();
+
+        /*
+         * posicionando bonus
+         */
+        positionBonus();
+
+        /*
+         * posicionando a los enemigos
+         */
+        positionEnemies();
+    }
+
     @Override
     public void gameStartup() {
         if (!PLAY) {
@@ -1046,13 +1198,14 @@ public class Bomberman extends JGame {
             walls.addAll(factory.getParedes(Pared.PARED_PIEDRA, BORDER_WALLS + INTERIOR_WALLS));
             brickWalls.addAll(factory.getParedes(Pared.PARED_LADRILLO, BRICK_WALLS));
 
-            enemies.addAll(factory.getEnemigos(Enemigo.ENEMIGO_ROSA, 6));
+            enemies.addAll(factory.getEnemigos(Enemigo.ENEMIGO_ROSA, 0));
 
             /*
              * eligiendo dos bonus de forma aleatoria
              */
-            bonus.add(factory.getBonus(r.nextInt(6)));
-            bonus.add(factory.getBonus(r.nextInt(6)));
+            for (int i = 0; i < BONUS_PER_STAGE; i++) {
+                bonus.add(factory.getBonus(r.nextInt(6)));
+            }
             bonus.add(factory.getBonus(Bonus.PUERTA));
 
             /*
@@ -1101,112 +1254,21 @@ public class Bomberman extends JGame {
             /*
              * posicionando a las paredes de ladrillo
              */
-            for (Pared bw : brickWalls) {
-                double x = LEFT_WALL_LIMIT + 32 * (2 * (r.nextInt(11)));
-                double y = UPPER_WALL_LIMIT + 32 * (2 * (r.nextInt(5)));
-
-                int row = (int) y / 32 - 2;
-                int col = (int) x / 32;
-
-                boolean NULL_WALL_POS1 = row == 1 && col == 1;
-                boolean NULL_WALL_POS2 = row == 1 && col == 2;
-                boolean NULL_WALL_POS3 = row == 2 && col == 1;
-
-                while (mapPositions[row][col] == 1 || mapPositions[row][col] == 4 || NULL_WALL_POS1 || NULL_WALL_POS2
-                        || NULL_WALL_POS3) {
-                    x = LEFT_WALL_LIMIT + 32 * (2 * (r.nextInt(11)));
-                    y = UPPER_WALL_LIMIT + 32 * (2 * (r.nextInt(5)));
-
-                    row = (int) (y / 32 - 2);
-                    col = (int) (x / 32);
-
-                    NULL_WALL_POS1 = row == 1 && col == 1;
-                    NULL_WALL_POS2 = row == 1 && col == 2;
-                    NULL_WALL_POS3 = row == 2 && col == 1;
-                }
-
-                bw.setPosition(x, y);
-                mapPositions[row][col] = 4;
-            }
+            positionBrickWalls();
 
             /*
              * posicionando bonus
              */
-            for (Bonus b : bonus) {
-                Pared bw = brickWalls.get(r.nextInt(BRICK_WALLS));
-                b.setPosition(bw.getX(), bw.getY());
-
-                int row = (int) (b.getY() / 32 - 2);
-                int col = (int) (b.getX() / 32);
-
-                while (mapPositions[row][col] == 5) {
-                    bw = brickWalls.get(r.nextInt(2));
-                    b.setPosition(bw.getX(), bw.getY());
-
-                    row = (int) (b.getY() / 32 - 2);
-                    col = (int) (b.getX() / 32);
-                }
-
-                mapPositions[row][col] = 5;
-            }
+            positionBonus();
 
             /*
              * posicionando a los enemigos
              */
-            for (Enemigo e : enemies) {
-                double x = LEFT_WALL_LIMIT + 32 * (2 * (r.nextInt(11)));
-                double y = UPPER_WALL_LIMIT + 32 * (2 * (r.nextInt(5)));
-
-                int row = (int) (y / 32 - 2);
-                int col = (int) (x / 32);
-
-                boolean NULL_WALL_POS = mapPositions[row][col] == 1;
-                boolean NULL_HERO_POS = mapPositions[row][col] == 3;
-                boolean NULL_BRICK_WALL_POS = mapPositions[row][col] == 4;
-
-                while (NULL_WALL_POS || NULL_HERO_POS || NULL_BRICK_WALL_POS) {
-                    x = LEFT_WALL_LIMIT + 32 * (2 * (r.nextInt(11)));
-                    y = UPPER_WALL_LIMIT + 32 * (2 * (r.nextInt(5)));
-
-                    row = (int) (y / 32 - 2);
-                    col = (int) (x / 32);
-
-                    NULL_WALL_POS = mapPositions[row][col] == 1;
-                    NULL_HERO_POS = mapPositions[row][col] == 3;
-                    NULL_BRICK_WALL_POS = mapPositions[row][col] == 4;
-                }
-
-                e.setPosition(x, y);
-                mapPositions[row][col] = 2;
-            }
+            positionEnemies();
         }
     }
 
     @Override
     public void gameShutdown() {
-    }
-
-    @Override
-    protected void readPropertiesFile() {
-        SettingsController.readSettings();
-
-        player = SistemaJuegos.player;
-        player.setNickName(SettingsController.getPlayerName()); // nombre del jugador
-
-        FULL_SCREEN = SettingsController.getFullScreenState(); // estado de la pantalla completa
-        SOUND = SettingsController.getSoundState(); // estado del sonido
-
-        playerKeys = new HashMap<String, Integer>(SettingsController.getCustomKeys().size()); // teclas del juego
-
-        for (String key : SettingsController.getCustomKeys().keySet()) {
-            playerKeys.put(key, Integer.parseInt(SettingsController.getCustomKeys().get(key)));
-        }
-
-        // if(FULL_SCREEN) {
-        // Mundo.WORLD_WIDTH = (int)
-        // Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-        // Mundo.WORLD_HEIGHT = (int)
-        // Toolkit.getDefaultToolkit().getScreenSize().getHeight();
-        // }
     }
 }

@@ -3,7 +3,10 @@ package model;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.net.URL;
+import java.util.Properties;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -14,8 +17,11 @@ import com.entropyinteractive.JGame;
 
 import model.bomberman.Bomberman;
 import model.jugador.Jugador;
+import model.properties.controller.SettingsController;
+import model.properties.view.SettingsView;
+import model.properties.view.views_listeners.ScreenStateListener;
 
-public class SistemaJuegos extends JPanel implements ActionListener {
+public class SistemaJuegos extends JPanel implements ActionListener, ScreenStateListener {
     private static final long serialVersionUID = 1L;
 
     public static Jugador player;
@@ -27,14 +33,14 @@ public class SistemaJuegos extends JPanel implements ActionListener {
         player = new Jugador("Player");
 
         int rows = 0;
-    	int columns = 1;
-    	int separator = 10;
+        int columns = 1;
+        int separator = 10;
 
-    	this.setLayout(new GridLayout(rows, columns, separator, separator));
+        this.setLayout(new GridLayout(rows, columns, separator, separator));
 
-    	bBomberman = new JButton();
-    	bProx = new JButton();
-            
+        bBomberman = new JButton();
+        bProx = new JButton();
+
         try {
             URL iconURL = getClass().getResource("/imagenes/logo_b.png");
             ImageIcon icon = new ImageIcon(iconURL);
@@ -48,13 +54,16 @@ public class SistemaJuegos extends JPanel implements ActionListener {
         }
 
         bBomberman.addActionListener(this);
+        SettingsView.getMainView().addOptionsPanelSSL(this);
+
         this.add(bBomberman);
         this.add(bProx);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getActionCommand() == bBomberman.getActionCommand()){
+        if (e.getActionCommand() == bBomberman.getActionCommand()) {
+            SettingsController.closeConfig();
             game = new Bomberman();
 
             t = new Thread() {
@@ -96,7 +105,21 @@ public class SistemaJuegos extends JPanel implements ActionListener {
     /*
         Setters
     */
-    public void setPlayer(Jugador player) {
-        this.player = player;
+    public static void setPlayer(Jugador player) {
+        SistemaJuegos.player = player;
+    }
+
+    @Override
+    public void stateChanged(boolean state) {
+        try {
+            FileReader reader = new FileReader("jgame.properties");  
+      
+            Properties p = new Properties();  
+            p.load(reader);
+            p.setProperty("fullScreen", String.valueOf(state));
+            p.store(new FileOutputStream("jgame.properties"), null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

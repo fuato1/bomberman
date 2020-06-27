@@ -26,11 +26,11 @@ public class Puerta extends ObjetoGrafico implements Bonus {
 
     @Override
     public void activateBonus(Heroe h) {
+        h.setHasReachedDoor(true);
     }
 
     @Override
-    public void deactivateBonus(Heroe h) {
-    }
+    public void deactivateBonus(Heroe h) {}
 
     @Override
     public void changeObject() {}
