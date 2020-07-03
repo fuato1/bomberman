@@ -20,11 +20,8 @@ public class KeysPanel extends JPanel {
         keysPanelFields = new Vector<FormField>(SettingsController.getCustomKeys().size());
 
         for (String key : SettingsController.getCustomKeys().keySet()) {
-            keysPanelFields.add(new FormField(
-                new GridLayout(1, 2), 
-                key, 
-                KeyEvent.getKeyText(Integer.parseInt(SettingsController.getCustomKeys().get(key)))
-            ));
+            keysPanelFields.add(new FormField(new GridLayout(1, 2), key,
+                    KeyEvent.getKeyText(Integer.parseInt(SettingsController.getCustomKeys().get(key)))));
             this.add(keysPanelFields.lastElement());
         }
     }

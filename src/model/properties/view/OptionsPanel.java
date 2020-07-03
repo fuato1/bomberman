@@ -19,9 +19,6 @@ import model.properties.view.views_listeners.ScreenStateListener;
 public class OptionsPanel extends JPanel implements ActionListener, ButtonListener {
     private static final long serialVersionUID = 1L;
 
-    // listener para estado de pantalla completa
-    private ScreenStateListener ssl;
-
     // componentes del panel de opciones
     private JLabel playerNameL;
     private JTextField playerNameTF;
@@ -34,6 +31,9 @@ public class OptionsPanel extends JPanel implements ActionListener, ButtonListen
 
     private JLabel keysL;
     private KeysPanel keysP;
+
+    // listener para estado de pantalla completa
+    private ScreenStateListener ssl;
 
     public OptionsPanel(LayoutManager layout) {
         super(layout);
@@ -94,30 +94,28 @@ public class OptionsPanel extends JPanel implements ActionListener, ButtonListen
     }
 
     public void actionPerformed(ActionEvent e) {
-        if(e.getActionCommand() == fullScreenCB.getActionCommand()) {
+        if (e.getActionCommand() == fullScreenCB.getActionCommand()) {
             changeScreenState();
         }
-        if(e.getActionCommand() == soundCB.getActionCommand()) {
+        if (e.getActionCommand() == soundCB.getActionCommand()) {
             changeSoundState();
         }
     }
 
     private void changeScreenState() {
-        if(fullScreenCB.isSelected()) {
+        if (fullScreenCB.isSelected()) {
             SettingsController.setFullScreenState(true);
             ssl.stateChanged(true);
-        }
-        else {
+        } else {
             SettingsController.setFullScreenState(false);
             ssl.stateChanged(false);
         }
     }
 
     private void changeSoundState() {
-        if(soundCB.isSelected()) {
+        if (soundCB.isSelected()) {
             SettingsController.setSoundState(true);
-        }
-        else {
+        } else {
             SettingsController.setSoundState(false);
         }
     }
@@ -144,6 +142,3 @@ public class OptionsPanel extends JPanel implements ActionListener, ButtonListen
         keysP.resetKeysPanelFields();
     }
 }
-
-
-

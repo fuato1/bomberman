@@ -8,8 +8,11 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public abstract class ObjetoGrafico {
-    protected BufferedImage image; // sprite del OG
-    protected Point2D.Double position = new Point2D.Double(); // posicion
+    /*
+     * Imagen, posicion y contador de animacion del objeto grafico.
+     */
+    protected BufferedImage image;
+    protected Point2D.Double position = new Point2D.Double();
     protected double ANIMATION_COUNTER = 0;
 
     public ObjetoGrafico(String filename) {
@@ -21,30 +24,30 @@ public abstract class ObjetoGrafico {
     }
 
     /*
-        Getters 
-    */
+     * Getters.
+     */
     public int getWidth() {
-		return this.image.getWidth();
+        return this.image.getWidth();
     }
-    
-	public int getHeight() {
-		return this.image.getHeight();
-    }
-    
-    public double getX() {
-		return this.position.getX();
-	}
 
-	public double getY() {
-		return this.position.getY();
+    public int getHeight() {
+        return this.image.getHeight();
+    }
+
+    public double getX() {
+        return this.position.getX();
+    }
+
+    public double getY() {
+        return this.position.getY();
     }
 
     /*
-        Setters
-    */
-	public void setPosition(double x, double y) {
-		this.position.setLocation(x, y);
-	}
+     * Setters.
+     */
+    public void setPosition(double x, double y) {
+        this.position.setLocation(x, y);
+    }
 
     public void draw(Graphics2D g) {
         g.drawImage(this.image, (int) this.position.getX(), (int) this.position.getY(), null);

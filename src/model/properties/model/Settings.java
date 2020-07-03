@@ -3,14 +3,15 @@ package model.properties.model;
 import java.util.HashMap;
 
 public class Settings {
-    private String playerName;
     private boolean fullScreen;
     private boolean sound;
+    private String playerName;
     private HashMap<String, String> defaultKeys, customKeys;
 
     private static Settings settings;
 
-    private Settings(String playerName, boolean fullScreen, boolean sound, HashMap<String, String> defaultKeys, HashMap<String, String> customKeys) {
+    private Settings(String playerName, boolean fullScreen, boolean sound, HashMap<String, String> defaultKeys,
+            HashMap<String, String> customKeys) {
         this.playerName = playerName;
         this.fullScreen = fullScreen;
         this.sound = sound;
@@ -19,7 +20,7 @@ public class Settings {
     }
 
     public static Settings getSettings() {
-        if(settings == null) {
+        if (settings == null) {
             HashMap<String, String> defaultKeys = new HashMap<String, String>(7);
             HashMap<String, String> customKeys = new HashMap<String, String>(7);
 
@@ -39,12 +40,8 @@ public class Settings {
     }
 
     /*
-        Getters
-    */
-    public String getPlayerName() {
-        return playerName;
-    }
-
+     * Getters
+     */
     public boolean isFullScreen() {
         return fullScreen;
     }
@@ -53,35 +50,35 @@ public class Settings {
         return sound;
     }
 
-    /*
-        Setters
-    */
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
-    }
-
-    public void setFullScreen(boolean fullScreen) {
-        this.fullScreen = fullScreen;
-    }
-    
-    public void setSound(boolean sound) {
-        this.sound = sound;
-    }
-
-    public static void setSettings(Settings settings) {
-        Settings.settings = settings;
+    public String getPlayerName() {
+        return playerName;
     }
 
     public HashMap<String, String> getDefaultKeys() {
         return defaultKeys;
     }
 
-    public void setDefaultKeys(HashMap<String, String> defaultKeys) {
-        this.defaultKeys = defaultKeys;
-    }
-
     public HashMap<String, String> getCustomKeys() {
         return customKeys;
+    }
+
+    /*
+     * Setters
+     */
+    public void setFullScreen(boolean fullScreen) {
+        this.fullScreen = fullScreen;
+    }
+
+    public void setSound(boolean sound) {
+        this.sound = sound;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+    public void setDefaultKeys(HashMap<String, String> defaultKeys) {
+        this.defaultKeys = defaultKeys;
     }
 
     public void setCustomKeys(HashMap<String, String> customKeys) {

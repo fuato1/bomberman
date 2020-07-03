@@ -14,13 +14,13 @@ public class Mundo {
         this.world = new Rectangle2D.Double(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     }
 
-    /*  
-        Getters
-    */
+    /*
+     * Getters.
+     */
     public static Mundo getInstance() {
         if (INSTANCE == null) {
             synchronized (Mundo.class) {
-                if(INSTANCE == null)
+                if (INSTANCE == null)
                     INSTANCE = new Mundo();
             }
         }
@@ -36,9 +36,9 @@ public class Mundo {
         return this.world.getHeight();
     }
 
-    /* 
-        Setters
-    */
+    /*
+     * Setters.
+     */
     public void setWorldLimits(int w, int h) {
         world = new Rectangle2D.Double(0, 0, w, h);
     }

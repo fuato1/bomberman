@@ -4,11 +4,8 @@ import java.util.Vector;
 
 import model.Heroe;
 import model.ObjetoGrafico;
-import model.bonus.strategy.Bonus;
+import model.bomberman.Bomberman;
 import model.enemigo.Enemigo;
-import model.enemigo.EnemigoAzul;
-import model.factory.OGAbstractFactory;
-import model.factory.OGFactoryProducer;
 
 public class BombaExtra extends ObjetoGrafico implements Bonus {
     private boolean WAS_HIT = false;
@@ -17,10 +14,12 @@ public class BombaExtra extends ObjetoGrafico implements Bonus {
         super("/imagenes/bonus/bomba_extra.png");
     }
 
+    @Override
     public boolean wasHit() {
         return WAS_HIT;
     }
 
+    @Override
     public void setWasHit(boolean WAS_HIT) {
         this.WAS_HIT = WAS_HIT;
     }
@@ -38,9 +37,9 @@ public class BombaExtra extends ObjetoGrafico implements Bonus {
     @Override
     public void changeObject() {}
 
+    @Override
     public Vector<Enemigo> spawnEnemies() {
-        OGAbstractFactory factory = OGFactoryProducer.getFactory();
-        Vector<Enemigo> enemies = factory.getEnemigos(Enemigo.ENEMIGO_AZUL, 6);
+        Vector<Enemigo> enemies = Bomberman.factory.getEnemigos(Enemigo.ENEMIGO_AZUL, 6);
 
         for (Enemigo e : enemies) {
             e.setImmunityTime(80);

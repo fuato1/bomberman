@@ -4,20 +4,29 @@ import java.util.Vector;
 
 import model.bomberman.Bomberman;
 import model.bomberman.Mundo;
-import model.bonus.strategy.Bonus;
-import model.factory.OGAbstractFactory;
-import model.factory.OGFactoryProducer;
+import model.bonus.Bonus;
 import model.interfaces.ObjetoCambianteMovible;
 
 public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
+    /*
+     * Variables para la cantidad de vidas, velocidad de desplazamiento y bonus que
+     * estan activos.
+     */
     private int life;
     private double HERO_DISPLACEMENT = 100.0;
     private Vector<Bonus> bonus;
 
+    /*
+     * Variables de estado para control de colisiones y muerte del heroe.
+     */
     private boolean IS_OVER_WALL = false;
     private boolean IS_NEXT_TO_WALL = false;
     private boolean IS_DEAD = false;
-    
+
+    /*
+     * Variables de estado que se modifican con los bonus que el heroe va
+     * consiguiendo.
+     */
     private int MAX_BOMBS = 1;
     private boolean HAS_DETONATOR = false;
     private boolean CAN_JUMP_BOMBS = false;
@@ -31,10 +40,14 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     }
 
     /*
-        Getters
-    */
+     * Getters.
+     */
     public int getLife() {
         return life;
+    }
+
+    public double getHeroDisplacement() {
+        return HERO_DISPLACEMENT;
     }
 
     public int getMaxBombs() {
@@ -43,10 +56,6 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
 
     public boolean hasDetonator() {
         return HAS_DETONATOR;
-    }
-
-    public double getHeroDisplacement() {
-        return HERO_DISPLACEMENT;
     }
 
     public boolean canJumpBombs() {
@@ -78,10 +87,14 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     }
 
     /*
-        Setters
-    */
+     * Setters.
+     */
     public void setLife(int life) {
         this.life = life;
+    }
+
+    public void setHeroDisplacement(double HERO_DISPLACEMENT) {
+        this.HERO_DISPLACEMENT = HERO_DISPLACEMENT;
     }
 
     public void setMaxBombs(int MAX_BOMBS) {
@@ -90,10 +103,6 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
 
     public void setHasDetonator(boolean HAS_DETONATOR) {
         this.HAS_DETONATOR = HAS_DETONATOR;
-    }
-
-    public void setHeroDisplacement(double HERO_DISPLACEMENT) {
-        this.HERO_DISPLACEMENT = HERO_DISPLACEMENT;
     }
 
     public void setCanJumpBombs(boolean CAN_JUMP_BOMBS) {
@@ -108,8 +117,11 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
         this.HAS_REACHED_DOOR = HAS_REACHED_DOOR;
     }
 
+    /*
+     * Metodos del heroe para agregar bonus activos y quitarlos.
+     */
     public void consumeBonus(Bonus b) {
-        if(!(b == null)) {
+        if (!(b == null)) {
             bonus.add(b);
             b.activateBonus(this);
         }
@@ -122,12 +134,14 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
         bonus.removeAllElements();
     }
 
+    /*
+     * Metodo para que el heroe ponga una bomba
+     */
     public Bomba setBomb() {
-        checkHorizontalMovement(); // arreglar
-        checkHorizontalMovement(); // arreglar
+        checkHorizontalMovement();
+        checkHorizontalMovement();
 
-        OGAbstractFactory factory = OGFactoryProducer.getFactory();
-        Bomba b = factory.getBomba();
+        Bomba b = Bomberman.factory.getBomba();
 
         b.setPosition(checkHorizontalBombPosition(), checkVerticalBombPosition());
 
@@ -135,19 +149,61 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     }
 
     /*
-        cambio de sprites
-    */
+     * checkHorizontalBombPosition: para control de posicion horizontal de la bomba.
+     * 
+     * checkVerticalBombPosition: para control de posicion vertical de la bomba.
+     */
+    private int checkHorizontalBombPosition() {
+        double left, right;
+
+        for (int i = 0; i < 25; i++) {
+            if (32 * (i + 1) <= getX() + 16 && getX() + 16 <= 32 * (i + 2)) {
+                left = 32 * (i + 1) - getX();
+                right = 32 * (i + 2) - getX();
+
+                if (left < right) {
+                    return 32 * (i + 1);
+                } else if (left >= right) {
+                    return 32 * (i + 2);
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    private int checkVerticalBombPosition() {
+        double up, down;
+
+        for (int i = 0; i < 13; i++) {
+            if (105 + 32 * i <= getY() + 16 && getY() + 16 <= 137 + 32 * i) {
+                up = 105 + 32 * i - getY();
+                down = 137 + 32 * i - getY();
+
+                if (up < down) {
+                    return 105 + 32 * i;
+                } else if (up >= down) {
+                    return 137 + 32 * i;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    /*
+     * Metodos de ObjetoCambianteEstatico. Animaciones de moviviento y muerte.
+     */
     @Override
     public void changeObject(String dir) {
-        if(ANIMATION_COUNTER > 40) {
+        if (ANIMATION_COUNTER > 40) {
             ANIMATION_COUNTER = 0;
-        }
-        else {
-            if(ANIMATION_COUNTER < 10)
+        } else {
+            if (ANIMATION_COUNTER < 10)
                 update("/imagenes/bomberman/" + dir + "/b_" + dir + "-1.png");
-            if(ANIMATION_COUNTER >= 20)
+            if (ANIMATION_COUNTER >= 20)
                 update("/imagenes/bomberman/" + dir + "/b_" + dir + "-2.png");
-            if(ANIMATION_COUNTER >= 30)
+            if (ANIMATION_COUNTER >= 30)
                 update("/imagenes/bomberman/" + dir + "/b_" + dir + "-3.png");
 
             ANIMATION_COUNTER++;
@@ -156,20 +212,18 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
 
     @Override
     public void kill() {
-        if(ANIMATION_COUNTER > 80) {
+        if (ANIMATION_COUNTER > 80) {
             ANIMATION_COUNTER = 80;
             IS_DEAD = false;
             setPosition(Bomberman.LEFT_WALL_LIMIT, Bomberman.UPPER_WALL_LIMIT);
             update("/imagenes/bomberman/down/b_down-1.png");
-        }
-        else if(ANIMATION_COUNTER > 70) {
+        } else if (ANIMATION_COUNTER > 70) {
             update("/imagenes/null.png");
             ANIMATION_COUNTER++;
-        }
-        else {
+        } else {
             for (int i = 10; i <= 70; i += 10) {
-                if(i-10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i) {
-                    update("/imagenes/bomberman/eliminado/bomberman_M" + i/10 + ".png");
+                if (i - 10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i) {
+                    update("/imagenes/bomberman/eliminado/bomberman_M" + i / 10 + ".png");
                 }
             }
 
@@ -178,43 +232,12 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     }
 
     /*
-        checkeo para posicionar a las bombas en el centro
-        de las paredes de ladrillo
-    */
-    private int checkHorizontalBombPosition() {
-        for (int i = 0; i < 25; i++) {
-            boolean INSIDE_LEFT_RIGHT = 
-                32*(i+1) <= getX() && getX() <= 32*(i+2) ||
-                32*(i+1) <= getX()+32 && getX()+32 <= 32*(i+2);
-
-            if(INSIDE_LEFT_RIGHT) {
-                return 32*(i+1);
-            }
-        }
-
-        return 0;
-    }
-
-    private int checkVerticalBombPosition() {
-        for (int i = 0; i < 13; i++) {
-            boolean INSIDE_UP_DOWN =
-                105 + 32*i <= getY()+28 && getY()+28 <= 137 + 32*i ||
-                105 + 32*i <= getY() && getY() <= 137 + 32*i;
-
-            if(INSIDE_UP_DOWN) {
-                return 105 + 32*i;
-            }
-        }
-
-        return 0;
-    }
-
-    /*
-        checkeo para la posicion del heroe
-    */
+     * Control para las colisiones con las paredes de piedra y movimiento por el
+     * mapa. Estos metodos modifican IS_OVER_WALL y IS_NEXT_TO_WALL.
+     */
     private void checkVerticalMovement() {
         for (int i = 0; i < 11; i++) {
-            if((64 + 64*i)+1 < getX() + 30 && getX() < (96 + 64*i)-1) {
+            if ((64 + 64 * i) + 1 < getX() + 30 && getX() < (96 + 64 * i) - 1) {
                 IS_OVER_WALL = true;
             }
         }
@@ -222,25 +245,28 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
 
     private void checkHorizontalMovement() {
         for (int i = 0; i < 5; i++) {
-            if((137 + 64*i)+1 < getY() + 30 && getY() < (169 + 64*i)-1) {
+            if ((137 + 64 * i) + 1 < getY() + 30 && getY() < (169 + 64 * i) - 1) {
                 IS_NEXT_TO_WALL = true;
             }
         }
     }
 
     /*
-        movimiento
-    */
+     * Metodo para que mata al heroe.
+     */
     public void stop() {
         IS_DEAD = true;
         life--;
         deactivateBonus();
     }
 
+    /*
+     * Movimiento del heroe.
+     */
     public void up(double delta) {
         checkVerticalMovement();
 
-        if(!(getY() < Bomberman.UPPER_WALL_LIMIT+2) && !IS_OVER_WALL) {
+        if (!(getY() < Bomberman.UPPER_WALL_LIMIT + 2) && !IS_OVER_WALL) {
             IS_NEXT_TO_WALL = false;
             setPosition(getX(), getY() - HERO_DISPLACEMENT * delta);
         }
@@ -249,7 +275,7 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     public void down(double delta) {
         checkVerticalMovement();
 
-        if(!(getY() > Bomberman.LOWER_WALL_LIMIT - 33) && !IS_OVER_WALL) {
+        if (!(getY() > Bomberman.LOWER_WALL_LIMIT - 33) && !IS_OVER_WALL) {
             IS_NEXT_TO_WALL = false;
             setPosition(getX(), getY() + HERO_DISPLACEMENT * delta);
         }
@@ -258,18 +284,18 @@ public class Heroe extends ObjetoGrafico implements ObjetoCambianteMovible {
     public void left(double delta) {
         checkHorizontalMovement();
 
-        if(!(getX() < 34) && !IS_NEXT_TO_WALL) {
+        if (!(getX() < 34) && !IS_NEXT_TO_WALL) {
             IS_OVER_WALL = false;
             setPosition(getX() - HERO_DISPLACEMENT * delta, getY());
         }
     }
 
-    public void right(double delta) {    
+    public void right(double delta) {
         Mundo w = Mundo.getInstance();
 
         checkHorizontalMovement();
 
-        if(!((getX() + getWidth()) > w.getWidth()-34) && !IS_NEXT_TO_WALL) {
+        if (!((getX() + getWidth()) > w.getWidth() - 34) && !IS_NEXT_TO_WALL) {
             IS_OVER_WALL = false;
             setPosition(getX() + HERO_DISPLACEMENT * delta, getY());
         }

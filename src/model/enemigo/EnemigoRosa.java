@@ -7,25 +7,26 @@ public class EnemigoRosa extends Enemigo {
         super(fileName);
     }
 
+    /*
+     * Metodods de ObjetoCambianteMovible. Animaciones de moviviento y muerte.
+     */
     @Override
     public void changeObject(String dir) {
-        if(ENEMY_MOVING_TIME < 0) {
+        if (ENEMY_MOVING_TIME < 0 && !WAS_HIT) {
             Random r = new Random(System.currentTimeMillis());
-            CURRENT_DIRECTION = directions[r.nextInt(15)%4];
+            CURRENT_DIRECTION = directions[r.nextInt(15) % 4];
 
             ENEMY_MOVING_TIME = 30;
-        }
-        else {
+        } else {
             ENEMY_MOVING_TIME--;
         }
 
-        if(ANIMATION_COUNTER > 30) {
+        if (ANIMATION_COUNTER > 30) {
             ANIMATION_COUNTER = 0;
-        }
-        else {
+        } else {
             for (int i = 10; i <= 30; i += 10) {
-                if(i-10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i)
-                    update("/imagenes/enemigos/rosa/" + dir + "/enemigo_rosa-" + i/10 + ".png");
+                if (i - 10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i)
+                    update("/imagenes/enemigos/rosa/" + dir + "/enemigo_rosa-" + i / 10 + ".png");
             }
 
             ANIMATION_COUNTER++;
@@ -34,18 +35,16 @@ public class EnemigoRosa extends Enemigo {
 
     @Override
     public void kill() {
-        if(ANIMATION_COUNTER > 70) {
+        if (ANIMATION_COUNTER > 70) {
             ANIMATION_COUNTER = 70;
             IS_DEAD = true;
-        }
-        else if(ANIMATION_COUNTER >= 60) {
+        } else if (ANIMATION_COUNTER >= 60) {
             update("/imagenes/null.png");
             ANIMATION_COUNTER++;
-        }
-        else {
+        } else {
             for (int i = 10; i <= 50; i += 10) {
-                if(i-10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i)
-                    update("/imagenes/enemigos/rosa/eliminado/enemigo_rosa_M" + i/10 + ".png");
+                if (i - 10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i)
+                    update("/imagenes/enemigos/rosa/eliminado/enemigo_rosa_M" + i / 10 + ".png");
             }
 
             ANIMATION_COUNTER++;

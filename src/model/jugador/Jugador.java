@@ -4,19 +4,14 @@ public class Jugador {
     private String nickName;
     private int score;
 
-    public Jugador() {
-        this.nickName = "Player";
-        this.score = 0;
-    }
-
     public Jugador(String nickName) {
         this.nickName = nickName;
         this.score = 0;
     }
 
     /*
-        Getters
-    */
+     * Getters.
+     */
     public String getNickName() {
         return nickName;
     }
@@ -26,8 +21,8 @@ public class Jugador {
     }
 
     /*
-        Setters
-    */
+     * Setters.
+     */
     public void setNickName(String nickName) {
         this.nickName = nickName;
     }

@@ -24,10 +24,21 @@ import model.properties.view.views_listeners.ScreenStateListener;
 public class SistemaJuegos extends JPanel implements ActionListener, ScreenStateListener {
     private static final long serialVersionUID = 1L;
 
+    /*
+     * Instancia del jugador.
+     */
     public static Jugador player;
-    JGame game;
-    Thread t;
-    JButton bBomberman, bProx;
+
+    private JGame game;
+    private Thread t;
+    private JButton bBomberman, bProx;
+
+    public static void main(String[] args) {
+        SettingsController.initView();
+        
+        SistemaJuegos gs = new SistemaJuegos();
+        gs.launch();
+    }
 
     public SistemaJuegos() {
         player = new Jugador("Player");
@@ -60,22 +71,23 @@ public class SistemaJuegos extends JPanel implements ActionListener, ScreenState
         this.add(bProx);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand() == bBomberman.getActionCommand()) {
-            SettingsController.closeConfig();
-            game = new Bomberman();
-
-            t = new Thread() {
-                public void run() {
-                    game.run(1.0 / 60.0);
-                }
-            };
-
-            t.start();
-        }
+    /*
+     * Getters.
+     */
+    public static Jugador getPlayer() {
+        return player;
     }
 
+    /*
+     * Setters.
+     */
+    public static void setPlayer(Jugador player) {
+        SistemaJuegos.player = player;
+    }
+
+    /*
+     * Metodo que inicia el sistema de juegos.
+     */
     public void launch() {
         JFrame frame = new JFrame("Sistema de Juegos");
 
@@ -95,26 +107,28 @@ public class SistemaJuegos extends JPanel implements ActionListener, ScreenState
         frame.setVisible(true);
     }
 
-    /*
-        Getters
-    */
-    public Jugador getPlayer() {
-        return player;
-    }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand() == bBomberman.getActionCommand()) {
+            SettingsController.closeConfig();
+            game = new Bomberman();
 
-    /*
-        Setters
-    */
-    public static void setPlayer(Jugador player) {
-        SistemaJuegos.player = player;
+            t = new Thread() {
+                public void run() {
+                    game.run(1.0 / 60.0);
+                }
+            };
+
+            t.start();
+        }
     }
 
     @Override
     public void stateChanged(boolean state) {
         try {
-            FileReader reader = new FileReader("jgame.properties");  
-      
-            Properties p = new Properties();  
+            FileReader reader = new FileReader("jgame.properties");
+
+            Properties p = new Properties();
             p.load(reader);
             p.setProperty("fullScreen", String.valueOf(state));
             p.store(new FileOutputStream("jgame.properties"), null);

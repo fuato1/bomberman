@@ -4,42 +4,43 @@ import java.util.Vector;
 
 import model.Heroe;
 import model.ObjetoGrafico;
-import model.bonus.strategy.Bonus;
+import model.bomberman.Bomberman;
 import model.enemigo.Enemigo;
-import model.factory.OGAbstractFactory;
-import model.factory.OGFactoryProducer;
 
 public class RangoExplosion extends ObjetoGrafico implements Bonus {
     private boolean WAS_HIT = false;
-    
+
     public RangoExplosion() {
         super("/imagenes/bonus/rango_explosion.png");
     }
-    
+
+    @Override
     public boolean wasHit() {
         return WAS_HIT;
     }
 
+    @Override
     public void setWasHit(boolean WAS_HIT) {
         this.WAS_HIT = WAS_HIT;
     }
 
     @Override
     public void activateBonus(Heroe h) {
-        h.setExplosionRange(h.getExplosionRange()+1);
+        h.setExplosionRange(h.getExplosionRange() + 1);
     }
 
     @Override
     public void deactivateBonus(Heroe h) {
-        h.setExplosionRange(h.getExplosionRange()-1);
+        h.setExplosionRange(h.getExplosionRange() - 1);
     }
 
     @Override
-    public void changeObject() {}
+    public void changeObject() {
+    }
 
+    @Override
     public Vector<Enemigo> spawnEnemies() {
-        OGAbstractFactory factory = OGFactoryProducer.getFactory();
-        Vector<Enemigo> enemies = factory.getEnemigos(Enemigo.ENEMIGO_AZUL, 6);
+        Vector<Enemigo> enemies = Bomberman.factory.getEnemigos(Enemigo.ENEMIGO_AZUL, 6);
 
         for (Enemigo e : enemies) {
             e.setImmunityTime(80);

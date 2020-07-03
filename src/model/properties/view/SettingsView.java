@@ -3,7 +3,9 @@ package model.properties.view;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.WindowEvent;
+import java.net.URL;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -34,7 +36,7 @@ public class SettingsView extends JPanel {
     }
 
     public static SettingsView getMainView() {
-        if(mainView == null) {
+        if (mainView == null) {
             mainView = new SettingsView();
         }
 
@@ -52,6 +54,14 @@ public class SettingsView extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 1;
         this.add(buttonsPanel, gbc);
+
+        try {
+            URL iconURL = getClass().getResource("/imagenes/config.png");
+            ImageIcon icon = new ImageIcon(iconURL);
+            mainFrame.setIconImage(icon.getImage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         mainFrame.setSize(500, 400);

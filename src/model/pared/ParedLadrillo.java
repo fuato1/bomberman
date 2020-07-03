@@ -6,26 +6,25 @@ public class ParedLadrillo extends Pared {
     }
 
     /*
-        cambio de sprites
-    */
+     * Metodods de ObjetoCambianteEstatico. Animaciones de moviviento y golpe de
+     * explosion.
+     */
     @Override
     public void changeObject() {
-        if(ANIMATION_COUNTER > 70) {
+        if (ANIMATION_COUNTER > 70) {
             ANIMATION_COUNTER = 70;
             WAS_HIT = false;
             WAS_DESTROYED = true;
-        }
-        else if(ANIMATION_COUNTER > 60) {
+        } else if (ANIMATION_COUNTER > 60) {
             update("/imagenes/null.png");
             ANIMATION_COUNTER++;
-        }
-        else {
-            if(ANIMATION_COUNTER < 10)
+        } else {
+            if (ANIMATION_COUNTER < 10)
                 update("/imagenes/paredes/pared_ladrillo.png");
             else {
                 for (int i = 20; i <= 60; i += 10) {
-                    if(i-10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i)
-                        update("/imagenes/paredes/pared_ladrillo_R" + ((i/10)-1) + ".png");
+                    if (i - 10 <= ANIMATION_COUNTER && ANIMATION_COUNTER < i)
+                        update("/imagenes/paredes/pared_ladrillo_R" + ((i / 10) - 1) + ".png");
                 }
             }
 

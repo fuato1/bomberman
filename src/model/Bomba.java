@@ -1,8 +1,7 @@
 package model;
 
+import model.bomberman.Bomberman;
 import model.explosion.Explosion;
-import model.factory.OGAbstractFactory;
-import model.factory.OGFactoryProducer;
 import model.interfaces.ObjetoCambianteEstatico;
 
 public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
@@ -13,18 +12,17 @@ public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
     }
 
     /*
-        Getters
-    */
+     * Getters.
+     */
     public int getTime() {
         return this.time;
     }
 
     /*
-        detonacion de la bomba
-    */
+     * Detonacion de la bomba.
+     */
     public Explosion detonate(int range) {
-        OGAbstractFactory factory = OGFactoryProducer.getFactory();
-        Explosion e = factory.getExplosion(range);
+        Explosion e = Bomberman.factory.getExplosion(range);
         e.setPosition(this.getX(), this.getY());
         setPosition(0, 0);
 
@@ -32,31 +30,29 @@ public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
     }
 
     /*
-        Setters
-    */
+     * Setters.
+     */
     public void setTime(int time) {
         this.time = time;
     }
 
     /*
-        cambio de sprites
-    */
+     * Metodos de ObjetoCambianteEstatico. Animaciones de moviviento y muerte.
+     */
     @Override
     public void changeObject() {
-        if(this.ANIMATION_COUNTER > 120) {
+        if (this.ANIMATION_COUNTER > 120) {
             this.ANIMATION_COUNTER = 120;
-        }
-        else if(this.ANIMATION_COUNTER > 90) {
+        } else if (this.ANIMATION_COUNTER > 90) {
             this.update("/imagenes/null.png");
             this.ANIMATION_COUNTER++;
-        }
-        else {
+        } else {
             for (int i = 30; i <= 90; i += 30) {
-                if(this.ANIMATION_COUNTER == i)
+                if (this.ANIMATION_COUNTER == i)
                     time--;
 
-                if(i-30 <= this.ANIMATION_COUNTER && this.ANIMATION_COUNTER < i) {
-                    this.update("/imagenes/bombas/bomb-" + i/30 + ".png");
+                if (i - 30 <= this.ANIMATION_COUNTER && this.ANIMATION_COUNTER < i) {
+                    this.update("/imagenes/bombas/bomb-" + i / 30 + ".png");
                 }
             }
 
@@ -66,7 +62,6 @@ public class Bomba extends ObjetoGrafico implements ObjetoCambianteEstatico {
 
     @Override
     public void hit() {
-        // TODO Auto-generated method stub
 
     }
 }

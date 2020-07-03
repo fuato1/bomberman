@@ -13,13 +13,13 @@ import model.properties.view.views_listeners.ButtonListener;
 public class ButtonsPanel extends JPanel implements ActionListener {
     private static final long serialVersionUID = 1L;
 
-    // listener para cambiar las config en OptionsPanel
-    private ButtonListener bl;
-
     // botones para guardar y reiniciar las config
     private JButton save, reset;
 
-    // constructor 
+    // listener para cambiar las config en OptionsPanel
+    private ButtonListener bl;
+
+    // constructor
     public ButtonsPanel(LayoutManager layout) {
         super(layout);
         save = new JButton("Guardar Controles");
@@ -31,17 +31,17 @@ public class ButtonsPanel extends JPanel implements ActionListener {
         this.add(save);
         this.add(reset);
     }
-    
+
     // agregando OptionsPanel para poder comunicar cambios de estado
     public void addButtonListener(ButtonListener bl) {
         this.bl = bl;
     }
 
     public void actionPerformed(ActionEvent e) {
-        if(e.getActionCommand() == save.getActionCommand()) {
+        if (e.getActionCommand() == save.getActionCommand()) {
             saveConfig();
         }
-        if(e.getActionCommand() == reset.getActionCommand()) {
+        if (e.getActionCommand() == reset.getActionCommand()) {
             resetConfig();
         }
     }

@@ -11,6 +11,9 @@ public class Ranking {
         scores = new Vector<Jugador>();
     }
 
+    /*
+     * Getters.
+     */
     public Vector<Jugador> getScores() {
         return this.scores;
     }

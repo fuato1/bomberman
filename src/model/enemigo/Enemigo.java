@@ -8,17 +8,32 @@ import model.bomberman.Mundo;
 import model.interfaces.ObjetoCambianteMovible;
 
 public abstract class Enemigo extends ObjetoGrafico implements ObjetoCambianteMovible {
+    /*
+     * Constantes que identifican a los enemigos.
+     */
     public final static int ENEMIGO_ROSA = 0;
     public final static int ENEMIGO_AZUL = 1;
 
+    /*
+     * Variables usadas para el movimiento de los enemigos.
+     */
     private final double ENEMY_DISPLACEMENT = 100.0;
-    protected int IMMUNITY = 0;
     protected int ENEMY_MOVING_TIME = 30;
     protected String directions[] = { "up", "down", "left", "right" };
     protected String CURRENT_DIRECTION;
+
+    /*
+     * Inmunidad de los enemigos por cierto tiempo para que no mueran inmediatamente
+     * despues de aparecer cerca a una explosion (ej: golpear un bonus con una
+     * explosion).
+     */
+    protected int IMMUNITY = 0;
+
+    /*
+     * Variables de estado para los enemigos.
+     */
     protected boolean IS_DEAD = false;
     protected boolean WAS_HIT = false;
-
     private boolean IS_OVER_WALL = false;
     private boolean IS_NEXT_TO_WALL = false;
 
@@ -29,8 +44,8 @@ public abstract class Enemigo extends ObjetoGrafico implements ObjetoCambianteMo
     }
 
     /*
-        Getters
-    */
+     * Getters.
+     */
     public boolean isOverWall() {
         checkVerticalMovement();
         return IS_OVER_WALL;
@@ -62,8 +77,8 @@ public abstract class Enemigo extends ObjetoGrafico implements ObjetoCambianteMo
     }
 
     /*
-        Setters
-    */
+     * Setters.
+     */
     public void stop() {
         this.WAS_HIT = true;
     }
@@ -72,7 +87,7 @@ public abstract class Enemigo extends ObjetoGrafico implements ObjetoCambianteMo
         this.IMMUNITY = IMMUNITY;
     }
 
-    public void checkVerticalMovement() {
+    private void checkVerticalMovement() {
         for (int i = 0; i < 11; i++) {
             if ((64 + 64 * i) + 1 < getX() + 28 && getX() < (96 + 64 * i) - 1) {
                 IS_OVER_WALL = true;
@@ -80,7 +95,7 @@ public abstract class Enemigo extends ObjetoGrafico implements ObjetoCambianteMo
         }
     }
 
-    public void checkHorizontalMovement() {
+    private void checkHorizontalMovement() {
         for (int i = 0; i < 5; i++) {
             if ((137 + 64 * i) + 1 < getY() + 28 && getY() < (169 + 64 * i) - 1) {
                 IS_NEXT_TO_WALL = true;

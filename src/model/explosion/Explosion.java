@@ -4,22 +4,31 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import model.ObjetoGrafico;
-import model.factory.OGAbstractFactory;
-import model.factory.OGFactoryProducer;
+import model.bomberman.Bomberman;
 import model.interfaces.ObjetoCambianteEstatico;
 
 public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico {
     /*
-     * direcciones de la explosion
+     * Constantes para identificar a las direcciones de las explosion.
      */
     public final static int EXPLOSION_UP = 1;
     public final static int EXPLOSION_DOWN = 2;
     public final static int EXPLOSION_LEFT = 3;
     public final static int EXPLOSION_RIGHT = 4;
 
+    /*
+     * Variable de estado para controlar cuando la explosion desaparecio.
+     */
     private boolean vanishedExplosion = false;
+
+    /*
+     * Rango de la explosion.
+     */
     private int range = 1;
 
+    /*
+     * Partes de la explosion por direcciones.
+     */
     HashMap<String, Vector<ParteExplosion>> explosion;
 
     public Explosion(String filename, int range) {
@@ -28,16 +37,14 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
 
         explosion = new HashMap<String, Vector<ParteExplosion>>(4);
 
-        OGAbstractFactory factory = OGFactoryProducer.getFactory();
-
-        explosion.put("up", factory.getExplosionBranch(EXPLOSION_UP, range));
-        explosion.put("down", factory.getExplosionBranch(EXPLOSION_DOWN, range));
-        explosion.put("left", factory.getExplosionBranch(EXPLOSION_LEFT, range));
-        explosion.put("right", factory.getExplosionBranch(EXPLOSION_RIGHT, range));
+        explosion.put("up", Bomberman.factory.getExplosionBranch(EXPLOSION_UP, range));
+        explosion.put("down", Bomberman.factory.getExplosionBranch(EXPLOSION_DOWN, range));
+        explosion.put("left", Bomberman.factory.getExplosionBranch(EXPLOSION_LEFT, range));
+        explosion.put("right", Bomberman.factory.getExplosionBranch(EXPLOSION_RIGHT, range));
     }
 
     /*
-     * Getters
+     * Getters.
      */
     public HashMap<String, Vector<ParteExplosion>> getExplosion() {
         return explosion;
@@ -48,7 +55,7 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
     }
 
     /*
-     * Setters
+     * Setters.
      */
     @Override
     public void setPosition(double x, double y) {
@@ -56,6 +63,9 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
         setExplosion();
     }
 
+    /*
+     * Metodo para ubicar a las partes de explosion desde la posicion central.
+     */
     private void setExplosion() {
         for (String dir : explosion.keySet()) {
             if (dir == "up") {
@@ -79,7 +89,8 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
     }
 
     /*
-     * cambio de sprites
+     * Metodods de ObjetoCambianteEstatico. Animaciones de moviviento y golpe de
+     * explosion.
      */
     @Override
     public void changeObject() {
@@ -113,7 +124,5 @@ public class Explosion extends ObjetoGrafico implements ObjetoCambianteEstatico 
 
     @Override
     public void hit() {
-        // TODO Auto-generated method stub
-
     }
 }

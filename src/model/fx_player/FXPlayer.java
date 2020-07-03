@@ -4,13 +4,9 @@ import java.io.*;
 import java.net.URL;
 import javax.sound.sampled.*;
 
-/*
-   Esta clase solo funciona para archivos .wav
-*/
 public enum FXPlayer {
-   STAGE_THEME("stage_theme.wav"),
-   STAGE_START("stage_start.wav"),
-   TITLE_SCREEN("title_screen.wav");
+   STAGE_THEME("stage_theme.wav"), STAGE_START("stage_start.wav"), TITLE_SCREEN("title_screen.wav"),
+   BOMB_SOUND("bomb_sound.wav"), BONUS_SOUND("bonus_sound.wav"), GAME_OVER("game_over.wav");
 
    public static enum Volume {
       MUTE, LOW, MEDIUM, HIGH
@@ -40,7 +36,7 @@ public enum FXPlayer {
 
    public void play() {
       if (volume != Volume.MUTE) {
-         if (!clip.isRunning()){
+         if (!clip.isRunning()) {
             clip.setFramePosition(0);
             clip.start();
          }
@@ -48,9 +44,8 @@ public enum FXPlayer {
    }
 
    public void stop() {
-      if(clip.isRunning()) {
+      if (clip.isRunning()) {
          clip.stop();
-         clip.close();
       }
    }
 }

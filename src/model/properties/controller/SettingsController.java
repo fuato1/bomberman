@@ -19,8 +19,8 @@ public class SettingsController {
     // metodo para cargar las config
     public static void readSettings() {
         JSONParser parser = new JSONParser();
-        
-        try(FileReader reader = new FileReader("src/properties.json")) {
+
+        try (FileReader reader = new FileReader("src/properties.json")) {
             HashMap<Object, Object> config = (HashMap<Object, Object>) parser.parse(reader);
 
             // seteando controles desde properties.json
@@ -31,12 +31,12 @@ public class SettingsController {
             // seteando teclas desde properties.json
             JSONObject keys = (JSONObject) config.get("keys");
 
-            for(String key : model.getDefaultKeys().keySet()) {
+            for (String key : model.getDefaultKeys().keySet()) {
                 model.getCustomKeys().put(key, (String) keys.get(key));
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        } catch(ParseException p) {
+        } catch (ParseException p) {
             p.printStackTrace();
         }
     }
@@ -44,8 +44,8 @@ public class SettingsController {
     // metodo para guardar en el archivo JSON la config
     public static void saveSettings() {
         JSONParser parser = new JSONParser();
-        
-        try(FileReader reader = new FileReader("src/properties.json")) {
+
+        try (FileReader reader = new FileReader("src/properties.json")) {
             HashMap<Object, Object> config = (HashMap<Object, Object>) parser.parse(reader);
 
             // seteando controles desde properties.json
@@ -69,9 +69,9 @@ public class SettingsController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        } catch(ParseException p) {
+        } catch (ParseException p) {
             p.printStackTrace();
         }
     }
@@ -82,18 +82,18 @@ public class SettingsController {
     }
 
     /*
-        Getters  
-    */
-    public static String getPlayerName() {
-        return model.getPlayerName();
-    }
-
+     * Getters
+     */
     public static boolean getFullScreenState() {
         return model.isFullScreen();
     }
 
     public static boolean getSoundState() {
         return model.isSound();
+    }
+
+    public static String getPlayerName() {
+        return model.getPlayerName();
     }
 
     public static HashMap<String, String> getDefaultKeys() {
@@ -105,12 +105,8 @@ public class SettingsController {
     }
 
     /*
-        Setters 
-    */
-    public static void setPlayerName(String playerName) {
-        model.setPlayerName(playerName);
-    }
-
+     * Setters
+     */
     public static void setFullScreenState(boolean state) {
         model.setFullScreen(state);
     }
@@ -119,14 +115,13 @@ public class SettingsController {
         model.setSound(state);
     }
 
+    public static void setPlayerName(String playerName) {
+        model.setPlayerName(playerName);
+    }
+
     public static void closeConfig() {
         view.closeConfig();
     }
-
-    /*
-        Setters para customKeys
-        No hay setter para defaultKeys, ya que deberia ser inmutable
-    */
 
     public static void setCustomKeys(HashMap<String, String> customKeys) {
         model.setCustomKeys(customKeys);

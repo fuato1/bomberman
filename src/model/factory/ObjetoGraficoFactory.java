@@ -4,13 +4,13 @@ import java.util.Vector;
 
 import model.Bomba;
 import model.bonus.BombaExtra;
+import model.bonus.Bonus;
 import model.bonus.Detonador;
 import model.bonus.Puerta;
 import model.bonus.RangoExplosion;
 import model.bonus.SaltoBomba;
 import model.bonus.Velocidad;
 import model.bonus.VidaExtra;
-import model.bonus.strategy.Bonus;
 import model.enemigo.Enemigo;
 import model.enemigo.EnemigoAzul;
 import model.enemigo.EnemigoRosa;
@@ -21,6 +21,9 @@ import model.pared.ParedLadrillo;
 
 public class ObjetoGraficoFactory implements OGAbstractFactory {
 
+    /*
+     * Creacion de bonus.
+     */
     @Override
     public Bonus getBonus(int id) {
         if (id == Bonus.VIDA_EXTRA)
@@ -41,6 +44,9 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
         return null;
     }
 
+    /*
+     * Creacion de paredes.
+     */
     @Override
     public Pared getPared(int id) {
         if (id == Pared.PARED_PIEDRA)
@@ -62,6 +68,9 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
         return walls;
     }
 
+    /*
+     * Creacion de explosiones.
+     */
     @Override
     public Explosion getExplosion(int range) {
         return new Explosion("/imagenes/explosiones/center/center_exp-1.png", range);
@@ -72,7 +81,7 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
         Vector<ParteExplosion> expBranch = new Vector<ParteExplosion>(range);
 
         if (id == Explosion.EXPLOSION_UP) {
-            for (int i = 0; i < range-1; i++) {
+            for (int i = 0; i < range - 1; i++) {
                 expBranch.add(new ParteExplosion("/imagenes/explosiones/vertical/vertical_exp-1.png", "vertical"));
             }
 
@@ -80,7 +89,7 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
             return expBranch;
         }
         if (id == Explosion.EXPLOSION_DOWN) {
-            for (int i = 0; i < range-1; i++) {
+            for (int i = 0; i < range - 1; i++) {
                 expBranch.add(new ParteExplosion("/imagenes/explosiones/vertical/vertical_exp-1.png", "vertical"));
             }
 
@@ -88,16 +97,18 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
             return expBranch;
         }
         if (id == Explosion.EXPLOSION_LEFT) {
-            for (int i = 0; i < range-1; i++) {
-                expBranch.add(new ParteExplosion("/imagenes/explosiones/horizontal/horizontal_exp-1.png", "horizontal"));
+            for (int i = 0; i < range - 1; i++) {
+                expBranch
+                        .add(new ParteExplosion("/imagenes/explosiones/horizontal/horizontal_exp-1.png", "horizontal"));
             }
 
             expBranch.add(new ParteExplosion("/imagenes/explosiones/left/left_exp-1.png", "left"));
             return expBranch;
         }
         if (id == Explosion.EXPLOSION_RIGHT) {
-            for (int i = 0; i < range-1; i++) {
-                expBranch.add(new ParteExplosion("/imagenes/explosiones/horizontal/horizontal_exp-1.png", "horizontal"));
+            for (int i = 0; i < range - 1; i++) {
+                expBranch
+                        .add(new ParteExplosion("/imagenes/explosiones/horizontal/horizontal_exp-1.png", "horizontal"));
             }
 
             expBranch.add(new ParteExplosion("/imagenes/explosiones/right/right_exp-1.png", "right"));
@@ -107,6 +118,9 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
         return null;
     }
 
+    /*
+     * Creacion de enemigos.
+     */
     @Override
     public Enemigo getEnemigo(int id) {
         if (id == Enemigo.ENEMIGO_AZUL)
@@ -128,6 +142,9 @@ public class ObjetoGraficoFactory implements OGAbstractFactory {
         return enemies;
     }
 
+    /*
+     * Creacion de la bomba.
+     */
     @Override
     public Bomba getBomba() {
         return new Bomba();

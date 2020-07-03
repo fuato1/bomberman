@@ -25,42 +25,42 @@ public class FormField extends JPanel {
         fieldName = new JLabel(name, JLabel.CENTER);
         fieldValue = new JTextField(value);
 
-        fieldValue.addKeyListener(
-            new KeyListener(){
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    
-                }
+        fieldValue.addKeyListener(new KeyListener() {
+            @Override
+            public void keyPressed(KeyEvent e) {
 
-                @Override
-                public void keyTyped(KeyEvent e) {
-                    
-                }
-
-                @Override
-                public void keyReleased(KeyEvent e) {
-                    fieldValue.setText(KeyEvent.getKeyText(e.getKeyCode()));
-                    SettingsController.setSingleCustomKey(fieldName.getText(), Integer.toString(e.getKeyCode()));
-                    System.out.println(SettingsController.getCustomKeys().toString());
-                }
             }
-        );
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                fieldValue.setText(KeyEvent.getKeyText(e.getKeyCode()));
+                SettingsController.setSingleCustomKey(fieldName.getText(), Integer.toString(e.getKeyCode()));
+            }
+        });
 
         this.add(fieldName);
         this.add(fieldValue);
     }
 
-    // get fieldName
+    /*
+     * Getters.
+     */
     public String getFieldName() {
         return fieldName.getText();
     }
 
-    // get fieldValue
     public String getFieldValue() {
         return fieldValue.getText();
     }
 
-    // set fieldValue
+    /*
+     * Setters.
+     */
     public void setFieldValue(String fieldValue) {
         this.fieldValue.setText(KeyEvent.getKeyText(Integer.parseInt(fieldValue)));
     }
